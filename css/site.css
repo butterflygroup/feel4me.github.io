@@ -176,6 +176,36 @@ body {
   overflow: visible;
 }
 
+.selection-display {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  width: 100%;
+  max-width: 100%;
+  text-align: center;
+  background: var(--control-bg);
+  border: 1px solid var(--control-border);
+  border-radius: 12px;
+  min-height: 4.5rem;
+}
+
+.selection-display__title {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.selection-display__body {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--page-fg);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
 .wheel-mount .wheel-segment:focus {
   outline: none;
 }

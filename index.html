@@ -29,7 +29,16 @@
 
       <div class="wheel-stage">
         <div id="wheel-mount" class="wheel-mount" role="img" aria-label="Interactive feelings wheel"></div>
-        <p id="wheel-selection" class="wheel-selection sr-only" aria-live="polite"></p>
+        <div
+          id="wheel-selection"
+          class="selection-display"
+          aria-live="polite"
+          aria-atomic="true"
+          aria-labelledby="selection-heading"
+        >
+          <h3 id="selection-heading" class="selection-display__title">Selected</h3>
+          <p id="wheel-selection-text" class="selection-display__body">Tap a wedge to select</p>
+        </div>
       </div>
 
       <p id="hero-title" class="hero__note" hidden>

@@ -12,7 +12,9 @@ const HUB_LINE_GAP = Math.round(HUB_FONT_SIZE * 1.14);
 
 const mount = document.getElementById("wheel-mount");
 const themeSelect = document.getElementById("theme-select");
-const selectionLive = document.getElementById("wheel-selection");
+const selectionTextEl = document.getElementById("wheel-selection-text");
+
+const SELECTION_PLACEHOLDER = "Tap a wedge to select";
 
 let rotatingGroup = null;
 let rotationDeg = 0;
@@ -23,6 +25,8 @@ let idleFrame = 0;
 let inertiaHandle = 0;
 let velocityDegPerMs = 0;
 let lastMoveTs = 0;
+let tapStartX = 0;
+let tapStartY = 0;
 /** @type {object | null} */
 let wheelPayload = null;
 
@@ -232,6 +236,7 @@ function renderWheel(data) {
   svg.appendChild(hubText);
   mount.appendChild(svg);
   applyRotation();
+  resetSelectionDisplay();
 }
 
 function applyRotation() {
@@ -239,11 +244,17 @@ function applyRotation() {
   rotatingGroup.setAttribute("transform", `rotate(${rotationDeg})`);
 }
 
+function resetSelectionDisplay() {
+  if (selectionTextEl) selectionTextEl.textContent = SELECTION_PLACEHOLDER;
+}
+
 function selectSegment(path) {
   mount.querySelectorAll(".wheel-segment.is-selected").forEach((p) => p.classList.remove("is-selected"));
   path.classList.add("is-selected");
   const crumb = path.dataset.breadcrumb ?? path.dataset.label ?? "";
-  selectionLive.textContent = crumb ? `Selected: ${crumb}` : "";
+  if (selectionTextEl) {
+    selectionTextEl.textContent = crumb ? `Selected: ${crumb}` : SELECTION_PLACEHOLDER;
+  }
 }
 
 function pointerAngle(ev) {
@@ -308,6 +319,8 @@ function beginInertia() {
 
 mount.addEventListener("pointerdown", (ev) => {
   if (ev.button !== 0 && ev.pointerType === "mouse") return;
+  tapStartX = ev.clientX;
+  tapStartY = ev.clientY;
   stopIdleWhileDragging();
   stopInertia();
   dragPointerId = ev.pointerId;
@@ -342,6 +355,15 @@ mount.addEventListener("pointermove", (ev) => {
 
 function endDrag(ev) {
   if (dragPointerId !== ev.pointerId) return;
+
+  const dx = ev.clientX - tapStartX;
+  const dy = ev.clientY - tapStartY;
+  if (dx * dx + dy * dy <= 100) {
+    const hit = document.elementFromPoint(ev.clientX, ev.clientY);
+    const seg = hit?.closest?.(".wheel-segment");
+    if (seg) selectSegment(seg);
+  }
+
   dragPointerId = null;
   mount.classList.remove("is-idle");
   try {
