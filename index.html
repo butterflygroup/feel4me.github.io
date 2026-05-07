@@ -12,19 +12,29 @@
     <header class="hero">
       <div class="hero__toolbar">
         <div class="toolbar-cluster">
-          <label class="theme-field">
-            <span id="theme-label" class="theme-field__label">Color scheme</span>
-            <select id="theme-select" aria-labelledby="theme-label">
-              <option value="ocean">Ocean</option>
-              <option value="sunset">Sunset</option>
-              <option value="forest">Forest</option>
-              <option value="mono">Mono</option>
-            </select>
-          </label>
           <button type="button" id="colors-open" class="toolbar-btn" aria-haspopup="dialog" aria-controls="colors-dialog">
             Colors
           </button>
         </div>
+        <form id="feelings-search-form" class="feelings-search" role="search" aria-label="Search feelings">
+          <label for="feelings-search" class="sr-only">Search feelings</label>
+          <div class="feelings-search__combo">
+            <input
+              id="feelings-search"
+              class="feelings-search__input"
+              type="search"
+              name="q"
+              role="combobox"
+              aria-expanded="false"
+              aria-controls="feelings-search-list"
+              aria-autocomplete="list"
+              placeholder="Search feelings…"
+              autocomplete="off"
+              enterkeyhint="search"
+            />
+            <div id="feelings-search-list" class="feelings-search__list" role="listbox" hidden></div>
+          </div>
+        </form>
       </div>
 
       <div class="wheel-stage">
@@ -32,6 +42,7 @@
         <div
           id="wheel-selection"
           class="selection-display"
+          hidden
           aria-live="polite"
           aria-atomic="true"
           aria-labelledby="selection-heading"
@@ -53,9 +64,27 @@
     <dialog id="colors-dialog" class="colors-dialog" aria-labelledby="colors-dialog-title">
       <div class="colors-dialog__inner">
         <h2 id="colors-dialog-title" class="colors-dialog__title">Customize colors</h2>
-        <p class="colors-dialog__hint">Changes apply live. Use the toolbar preset for wedge style; sliders override hue, saturation, and lightness until you switch preset.</p>
+        <p class="colors-dialog__hint">
+          Changes apply live. Pick a color scheme preset below for wedge palettes; hue, saturation, and lightness sliders override
+          the preset until you switch preset again.
+        </p>
 
         <form id="colors-form" class="colors-form">
+          <fieldset class="colors-fieldset">
+            <legend>Color scheme</legend>
+            <div class="colors-row colors-row--theme">
+              <label class="theme-field theme-field--dialog">
+                <span id="theme-label" class="theme-field__label sr-only">Color scheme</span>
+                <select id="theme-select" aria-labelledby="theme-label">
+                  <option value="ocean">Ocean</option>
+                  <option value="sunset">Sunset</option>
+                  <option value="forest">Forest</option>
+                  <option value="mono">Mono</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
           <fieldset class="colors-fieldset">
             <legend>Page</legend>
             <label class="colors-row">

@@ -13,8 +13,13 @@ const HUB_LINE_GAP = Math.round(HUB_FONT_SIZE * 1.14);
 const mount = document.getElementById("wheel-mount");
 const themeSelect = document.getElementById("theme-select");
 const selectionTextEl = document.getElementById("wheel-selection-text");
+const selectionPanel = document.getElementById("wheel-selection");
+const selectionHeading = document.getElementById("selection-heading");
 
 const SELECTION_PLACEHOLDER = "Tap a wedge to select";
+
+/** Max rows in the feelings search suggestion list */
+const FEELINGS_SUGGEST_CAP = 10;
 
 let rotatingGroup = null;
 let rotationDeg = 0;
@@ -237,6 +242,16 @@ function renderWheel(data) {
   mount.appendChild(svg);
   applyRotation();
   resetSelectionDisplay();
+
+  const fsInput = document.getElementById("feelings-search");
+  const fsList = document.getElementById("feelings-search-list");
+  if (fsInput && fsList) {
+    if (fsInput.value.trim().length >= 2) {
+      updateFeelingsSearchSuggestions(fsInput, fsList);
+    } else {
+      closeFeelingsSearchList(fsInput, fsList);
+    }
+  }
 }
 
 function applyRotation() {
@@ -246,15 +261,276 @@ function applyRotation() {
 
 function resetSelectionDisplay() {
   if (selectionTextEl) selectionTextEl.textContent = SELECTION_PLACEHOLDER;
+  if (selectionHeading) selectionHeading.hidden = false;
+  if (selectionPanel) selectionPanel.hidden = true;
+}
+
+function clearSegmentSelection() {
+  mount.querySelectorAll(".wheel-segment.is-selected").forEach((p) => p.classList.remove("is-selected"));
+}
+
+/**
+ * @param {string} rawQuery
+ * @returns {SVGPathElement[]}
+ */
+function getSegmentCandidates(rawQuery) {
+  const q = rawQuery.trim().toLowerCase();
+  if (!q) return [];
+  const paths = mount.querySelectorAll(".wheel-segment");
+  /** @type {SVGPathElement[]} */
+  const candidates = [];
+  paths.forEach((p) => {
+    const label = (p.dataset.label ?? "").toLowerCase();
+    const crumb = (p.dataset.breadcrumb ?? "").toLowerCase();
+    if (label.includes(q) || crumb.includes(q)) candidates.push(p);
+  });
+  return candidates;
+}
+
+/**
+ * Exact label matches first, then longest breadcrumb; dedupe by breadcrumb.
+ * @param {SVGPathElement[]} paths
+ * @param {string} q normalized lowercase trimmed query
+ */
+function rankAndDedupeCandidates(paths, q) {
+  const exact = paths.filter((p) => (p.dataset.label ?? "").toLowerCase() === q);
+  const rest = paths.filter((p) => (p.dataset.label ?? "").toLowerCase() !== q);
+  function sortPool(arr) {
+    return [...arr].sort((a, b) => {
+      const ca = (a.dataset.breadcrumb ?? "").length;
+      const cb = (b.dataset.breadcrumb ?? "").length;
+      if (ca !== cb) return cb - ca;
+      return (a.dataset.label ?? "").localeCompare(b.dataset.label ?? "", undefined, { sensitivity: "base" });
+    });
+  }
+  const ordered = [...sortPool(exact), ...sortPool(rest)];
+  const seen = new Set();
+  /** @type {SVGPathElement[]} */
+  const out = [];
+  for (const p of ordered) {
+    const c = p.dataset.breadcrumb ?? "";
+    if (seen.has(c)) continue;
+    seen.add(c);
+    out.push(p);
+  }
+  return out;
+}
+
+/** @returns {SVGPathElement[]} */
+function rankedFeelingsMatches(rawQuery, limit = FEELINGS_SUGGEST_CAP) {
+  const q = rawQuery.trim().toLowerCase();
+  if (!q) return [];
+  const ranked = rankAndDedupeCandidates(getSegmentCandidates(rawQuery), q);
+  return ranked.slice(0, limit);
+}
+
+/** @returns {SVGPathElement | null} */
+function findBestSegmentMatch(rawQuery) {
+  const q = rawQuery.trim().toLowerCase();
+  if (!q) return null;
+  const ranked = rankAndDedupeCandidates(getSegmentCandidates(rawQuery), q);
+  return ranked[0] ?? null;
+}
+
+/** @type {number} */
+let feelingsSearchActiveIndex = -1;
+/** @type {SVGPathElement[]} */
+let feelingsSearchPaths = [];
+
+function closeFeelingsSearchList(input, listEl) {
+  feelingsSearchActiveIndex = -1;
+  feelingsSearchPaths = [];
+  listEl.hidden = true;
+  listEl.innerHTML = "";
+  input.removeAttribute("aria-activedescendant");
+  input.setAttribute("aria-expanded", "false");
+}
+
+function setFeelingsSearchActiveOption(input, listEl, index) {
+  const opts = listEl.querySelectorAll('[role="option"]');
+  feelingsSearchActiveIndex = index;
+  opts.forEach((el, i) => {
+    el.setAttribute("aria-selected", i === index ? "true" : "false");
+    el.classList.toggle("feelings-search__option--active", i === index);
+  });
+  if (index >= 0 && opts[index]) {
+    input.setAttribute("aria-activedescendant", opts[index].id);
+    opts[index].scrollIntoView({ block: "nearest" });
+  } else {
+    input.removeAttribute("aria-activedescendant");
+  }
+}
+
+function renderFeelingsSearchOptions(input, listEl, paths) {
+  listEl.innerHTML = "";
+  feelingsSearchPaths = paths;
+  feelingsSearchActiveIndex = paths.length > 0 ? 0 : -1;
+
+  paths.forEach((path, i) => {
+    const opt = document.createElement("div");
+    opt.id = `feelings-search-opt-${i}`;
+    opt.className = "feelings-search__option";
+    opt.setAttribute("role", "option");
+    opt.setAttribute("aria-selected", i === 0 ? "true" : "false");
+    opt.textContent = path.dataset.breadcrumb ?? path.dataset.label ?? "";
+    opt.addEventListener("mouseenter", () => setFeelingsSearchActiveOption(input, listEl, i));
+    opt.addEventListener("click", () => {
+      selectSegment(path);
+      closeFeelingsSearchList(input, listEl);
+    });
+    listEl.appendChild(opt);
+  });
+
+  if (paths.length > 0) {
+    listEl.hidden = false;
+    input.setAttribute("aria-expanded", "true");
+    setFeelingsSearchActiveOption(input, listEl, 0);
+  } else {
+    listEl.hidden = true;
+    input.setAttribute("aria-expanded", "false");
+    input.removeAttribute("aria-activedescendant");
+  }
+}
+
+function updateFeelingsSearchSuggestions(input, listEl) {
+  const raw = input.value;
+  const trimmed = raw.trim();
+
+  if (trimmed.length === 0) {
+    closeFeelingsSearchList(input, listEl);
+    clearSegmentSelection();
+    resetSelectionDisplay();
+    return;
+  }
+
+  if (trimmed.length < 2) {
+    closeFeelingsSearchList(input, listEl);
+    return;
+  }
+
+  const ranked = rankedFeelingsMatches(raw, FEELINGS_SUGGEST_CAP);
+  if (ranked.length === 0) {
+    closeFeelingsSearchList(input, listEl);
+    clearSegmentSelection();
+    if (selectionHeading) selectionHeading.hidden = true;
+    if (selectionTextEl) selectionTextEl.textContent = `No match for "${trimmed}"`;
+    if (selectionPanel) selectionPanel.hidden = false;
+    return;
+  }
+
+  if (selectionTextEl?.textContent.startsWith("No match")) {
+    if (selectionPanel) selectionPanel.hidden = true;
+    if (selectionHeading) selectionHeading.hidden = false;
+  }
+
+  renderFeelingsSearchOptions(input, listEl, ranked);
+}
+
+function commitFeelingsSearchSelection(input, listEl) {
+  const trimmed = input.value.trim();
+  if (trimmed.length === 0) {
+    clearSegmentSelection();
+    resetSelectionDisplay();
+    closeFeelingsSearchList(input, listEl);
+    return;
+  }
+
+  const listOpen = !listEl.hidden && feelingsSearchPaths.length > 0;
+  if (listOpen) {
+    const idx =
+      feelingsSearchActiveIndex >= 0 && feelingsSearchActiveIndex < feelingsSearchPaths.length
+        ? feelingsSearchActiveIndex
+        : 0;
+    const path = feelingsSearchPaths[idx];
+    if (path) {
+      selectSegment(path);
+      closeFeelingsSearchList(input, listEl);
+    }
+    return;
+  }
+
+  const path = findBestSegmentMatch(input.value);
+  if (!path) {
+    clearSegmentSelection();
+    if (selectionHeading) selectionHeading.hidden = true;
+    if (selectionTextEl) selectionTextEl.textContent = `No match for "${trimmed}"`;
+    if (selectionPanel) selectionPanel.hidden = false;
+    return;
+  }
+  selectSegment(path);
+}
+
+function handleFeelingsSearch(ev) {
+  ev.preventDefault();
+  const input = document.getElementById("feelings-search");
+  const listEl = document.getElementById("feelings-search-list");
+  if (!input || !listEl) return;
+  commitFeelingsSearchSelection(input, listEl);
+}
+
+function initFeelingsSearchUI() {
+  const form = document.getElementById("feelings-search-form");
+  const input = document.getElementById("feelings-search");
+  const combo = document.querySelector(".feelings-search__combo");
+  const listEl = document.getElementById("feelings-search-list");
+  if (!form || !input || !combo || !listEl) return;
+
+  let blurCloseTimer = 0;
+
+  form.addEventListener("submit", handleFeelingsSearch);
+
+  input.addEventListener("input", () => updateFeelingsSearchSuggestions(input, listEl));
+
+  listEl.addEventListener("mousedown", (ev) => {
+    ev.preventDefault();
+  });
+
+  combo.addEventListener("focusout", () => {
+    blurCloseTimer = window.setTimeout(() => {
+      closeFeelingsSearchList(input, listEl);
+    }, 150);
+  });
+
+  combo.addEventListener("focusin", () => {
+    window.clearTimeout(blurCloseTimer);
+  });
+
+  document.addEventListener("pointerdown", (ev) => {
+    if (!combo.contains(ev.target)) closeFeelingsSearchList(input, listEl);
+  });
+
+  input.addEventListener("keydown", (ev) => {
+    const open = !listEl.hidden && feelingsSearchPaths.length > 0;
+    if (ev.key === "Escape") {
+      if (open) {
+        ev.preventDefault();
+        closeFeelingsSearchList(input, listEl);
+      }
+      return;
+    }
+    if (!open) return;
+
+    if (ev.key === "ArrowDown") {
+      ev.preventDefault();
+      const next = Math.min(feelingsSearchActiveIndex + 1, feelingsSearchPaths.length - 1);
+      setFeelingsSearchActiveOption(input, listEl, next);
+    } else if (ev.key === "ArrowUp") {
+      ev.preventDefault();
+      const next = Math.max(feelingsSearchActiveIndex - 1, 0);
+      setFeelingsSearchActiveOption(input, listEl, next);
+    }
+  });
 }
 
 function selectSegment(path) {
   mount.querySelectorAll(".wheel-segment.is-selected").forEach((p) => p.classList.remove("is-selected"));
   path.classList.add("is-selected");
   const crumb = path.dataset.breadcrumb ?? path.dataset.label ?? "";
+  if (selectionHeading) selectionHeading.hidden = false;
   if (selectionTextEl) {
     selectionTextEl.textContent = crumb ? `Selected: ${crumb}` : SELECTION_PLACEHOLDER;
   }
+  if (selectionPanel) selectionPanel.hidden = !crumb;
 }
 
 function pointerAngle(ev) {
@@ -397,6 +673,8 @@ async function init() {
   });
 
   renderWheel(wheelPayload);
+
+  initFeelingsSearchUI();
 
   themeSelect?.addEventListener("change", () => {
     clearPresetWedgeOverrides();
