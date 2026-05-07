@@ -49,6 +49,36 @@
         >
           <h3 id="selection-heading" class="selection-display__title">Selected</h3>
           <p id="wheel-selection-text" class="selection-display__body">Tap a wedge to select</p>
+          <div id="emotion-guide" class="emotion-guide" hidden>
+            <p id="emotion-guide-empty" class="emotion-guide__empty" hidden>
+              No guide for this feeling yet. Use “Propose an edit” to draft copy or share suggestions.
+            </p>
+            <div class="emotion-guide__sections">
+              <section class="emotion-guide__block" aria-labelledby="emotion-guide-title-feel">
+                <h4 id="emotion-guide-title-feel" class="emotion-guide__heading"></h4>
+                <p id="emotion-guide-body-feel" class="emotion-guide__text"></p>
+              </section>
+              <section class="emotion-guide__block" aria-labelledby="emotion-guide-title-body">
+                <h4 id="emotion-guide-title-body" class="emotion-guide__heading"></h4>
+                <p id="emotion-guide-body-body" class="emotion-guide__text"></p>
+              </section>
+              <section class="emotion-guide__block" aria-labelledby="emotion-guide-title-call">
+                <h4 id="emotion-guide-title-call" class="emotion-guide__heading"></h4>
+                <p id="emotion-guide-body-call" class="emotion-guide__text"></p>
+              </section>
+              <section class="emotion-guide__block" aria-labelledby="emotion-guide-title-overcome">
+                <h4 id="emotion-guide-title-overcome" class="emotion-guide__heading"></h4>
+                <p id="emotion-guide-body-overcome" class="emotion-guide__text"></p>
+              </section>
+            </div>
+            <div class="emotion-guide__footer">
+              <div id="emotion-guide-draft-badge" class="emotion-guide__badge" hidden>Draft preview</div>
+              <button type="button" id="emotion-guide-propose" class="emotion-guide__btn">Propose an edit</button>
+              <button type="button" id="emotion-guide-clear-draft" class="emotion-guide__btn emotion-guide__btn--quiet" hidden>
+                Clear draft
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -183,6 +213,45 @@
             <button type="button" id="colors-close" class="colors-actions__btn colors-actions__btn--secondary">Close</button>
           </div>
         </form>
+      </div>
+    </dialog>
+
+    <dialog id="emotion-guide-edit-dialog" class="emotion-guide-dialog" aria-labelledby="emotion-guide-dialog-title">
+      <div class="emotion-guide-dialog__inner">
+        <h2 id="emotion-guide-dialog-title" class="emotion-guide-dialog__title">Propose guide copy</h2>
+        <p id="emotion-guide-dialog-crumb" class="emotion-guide-dialog__crumb"></p>
+        <p id="emotion-guide-url-length-warn" class="emotion-guide-dialog__warn" hidden></p>
+        <div class="emotion-guide-dialog__fields">
+          <div class="emotion-guide-dialog__field">
+            <label for="emotion-guide-field-feel">How you might feel</label>
+            <textarea id="emotion-guide-field-feel" class="emotion-guide-dialog__textarea" rows="4"></textarea>
+            <span id="emotion-guide-count-feel" class="emotion-guide-dialog__count" aria-live="polite"></span>
+          </div>
+          <div class="emotion-guide-dialog__field">
+            <label for="emotion-guide-field-body">What&apos;s going on in your body</label>
+            <textarea id="emotion-guide-field-body" class="emotion-guide-dialog__textarea" rows="4"></textarea>
+            <span id="emotion-guide-count-body" class="emotion-guide-dialog__count" aria-live="polite"></span>
+          </div>
+          <div class="emotion-guide-dialog__field">
+            <label for="emotion-guide-field-call">What this might be a call to be</label>
+            <textarea id="emotion-guide-field-call" class="emotion-guide-dialog__textarea" rows="4"></textarea>
+            <span id="emotion-guide-count-call" class="emotion-guide-dialog__count" aria-live="polite"></span>
+          </div>
+          <div class="emotion-guide-dialog__field">
+            <label for="emotion-guide-field-overcome">Ways to overcome this</label>
+            <textarea id="emotion-guide-field-overcome" class="emotion-guide-dialog__textarea" rows="4"></textarea>
+            <span id="emotion-guide-count-overcome" class="emotion-guide-dialog__count" aria-live="polite"></span>
+          </div>
+        </div>
+        <div class="emotion-guide-dialog__actions">
+          <button type="button" id="emotion-guide-dialog-cancel" class="emotion-guide-dialog__btn emotion-guide-dialog__btn--secondary">
+            Cancel
+          </button>
+          <button type="button" id="emotion-guide-copy-json" class="emotion-guide-dialog__btn emotion-guide-dialog__btn--secondary">
+            Copy JSON snippet
+          </button>
+          <button type="button" id="emotion-guide-copy-link" class="emotion-guide-dialog__btn">Copy share link</button>
+        </div>
       </div>
     </dialog>
 

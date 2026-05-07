@@ -1,4 +1,11 @@
 import { applyPaletteFromURL, clearPresetWedgeOverrides, initColorsPanel } from "./colors-panel.js";
+import {
+  hideEmotionGuidePanel,
+  initEmotionGuideUI,
+  renderEmotionGuide,
+  setBundledGuides,
+} from "./emotion-guide.js";
+import { flattenFeelingsForReference, normalizeSegment } from "./feelings-reference.js";
 
 const VIEW = 640;
 const HUB_R = 52;
@@ -52,14 +59,6 @@ function wedgePath(rInner, rOuter, a0, a1) {
   const [ix1, iy1] = polar(rInner, a1);
   const [ix0, iy0] = polar(rInner, a0);
   return `M ${ox0} ${oy0} A ${rOuter} ${rOuter} 0 ${arcLarge} 1 ${ox1} ${oy1} L ${ix1} ${iy1} A ${rInner} ${rInner} 0 ${arcLarge} 0 ${ix0} ${iy0} Z`;
-}
-
-function normalizeSegment(node) {
-  const childrenRaw = node.children ?? [];
-  const children = childrenRaw.map((c) =>
-    typeof c === "string" ? { label: c, children: [] } : normalizeSegment(c),
-  );
-  return { label: node.label, children };
 }
 
 function deepestLeafSteps(node) {
@@ -172,6 +171,9 @@ function renderWheel(data) {
     path.classList.add("wheel-segment");
     path.dataset.breadcrumb = crumb;
     path.dataset.label = node.label;
+    if (!node.children?.length) {
+      path.dataset.leaf = "1";
+    }
     path.tabIndex = 0;
     path.addEventListener("click", (ev) => {
       ev.stopPropagation();
@@ -191,7 +193,9 @@ function renderWheel(data) {
       arcSpan * textR > 42 || node.label.length <= 10 ? node.label : abbrev(node.label);
     appendLabel(svgNs, rotatingGroup, labelText, mid, textR, depth, maxDepth);
 
-    if (!node.children?.length) return;
+    if (!node.children?.length) {
+      return;
+    }
     const span = end - start;
     node.children.forEach((child, i) => {
       const cs = start + (span * i) / node.children.length;
@@ -260,6 +264,7 @@ function applyRotation() {
 }
 
 function resetSelectionDisplay() {
+  hideEmotionGuidePanel();
   if (selectionTextEl) selectionTextEl.textContent = SELECTION_PLACEHOLDER;
   if (selectionHeading) selectionHeading.hidden = false;
   if (selectionPanel) selectionPanel.hidden = true;
@@ -526,11 +531,13 @@ function selectSegment(path) {
   mount.querySelectorAll(".wheel-segment.is-selected").forEach((p) => p.classList.remove("is-selected"));
   path.classList.add("is-selected");
   const crumb = path.dataset.breadcrumb ?? path.dataset.label ?? "";
+  const isLeaf = path.dataset.leaf === "1";
   if (selectionHeading) selectionHeading.hidden = false;
   if (selectionTextEl) {
     selectionTextEl.textContent = crumb ? `Selected: ${crumb}` : SELECTION_PLACEHOLDER;
   }
   if (selectionPanel) selectionPanel.hidden = !crumb;
+  renderEmotionGuide(crumb, isLeaf);
 }
 
 function pointerAngle(ev) {
@@ -656,11 +663,22 @@ mount.addEventListener("pointercancel", endDrag);
 async function init() {
   applyPaletteFromURL();
 
-  const url = new URL("../data/emotions.json", import.meta.url);
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to load emotions (${res.status})`);
-  const data = await res.json();
+  const emotionsUrl = new URL("../data/emotions.json", import.meta.url);
+  const guidesUrl = new URL("../data/emotion-guides.json", import.meta.url);
+  const [emotionsRes, guidesRes] = await Promise.all([fetch(emotionsUrl), fetch(guidesUrl)]);
+  if (!emotionsRes.ok) throw new Error(`Failed to load emotions (${emotionsRes.status})`);
+  const data = await emotionsRes.json();
   wheelPayload = data;
+
+  if (guidesRes.ok) {
+    try {
+      setBundledGuides(await guidesRes.json());
+    } catch {
+      setBundledGuides({});
+    }
+  } else {
+    setBundledGuides({});
+  }
 
   let th = document.documentElement.dataset.theme ?? themeSelect?.value ?? "ocean";
   if (!["ocean", "sunset", "forest", "mono"].includes(th)) th = "ocean";
@@ -674,7 +692,16 @@ async function init() {
 
   renderWheel(wheelPayload);
 
+  const feelingsRefRows = flattenFeelingsForReference(data.segments.map(normalizeSegment));
+  const segmentCount = mount.querySelectorAll(".wheel-segment").length;
+  if (segmentCount !== feelingsRefRows.length) {
+    console.warn(
+      `[feelings wheel] Reference rows (${feelingsRefRows.length}) do not match segment count (${segmentCount}).`,
+    );
+  }
+
   initFeelingsSearchUI();
+  initEmotionGuideUI();
 
   themeSelect?.addEventListener("change", () => {
     clearPresetWedgeOverrides();

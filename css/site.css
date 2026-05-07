@@ -281,6 +281,210 @@ body {
   word-break: break-word;
 }
 
+.emotion-guide {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--control-border);
+  text-align: left;
+}
+
+.emotion-guide__badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--page-bg);
+  background: var(--center-fill);
+  border-radius: 6px;
+}
+
+.emotion-guide__footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.emotion-guide__btn {
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 1px solid var(--control-border);
+  background: var(--control-bg);
+  color: var(--control-fg);
+}
+
+.emotion-guide__btn:hover {
+  filter: brightness(1.06);
+}
+
+.emotion-guide__btn:focus-visible {
+  outline: 2px solid var(--accent-selected);
+  outline-offset: 2px;
+}
+
+.emotion-guide__btn--quiet {
+  font-weight: 550;
+}
+
+.emotion-guide__empty {
+  margin: 0 0 0.65rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.emotion-guide__sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.emotion-guide__heading {
+  margin: 0 0 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.emotion-guide__text {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--page-fg);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.emotion-guide-dialog {
+  margin: auto;
+  max-width: min(96vw, 32rem);
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--control-border);
+  border-radius: 14px;
+  background: var(--page-bg);
+  color: var(--page-fg);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+}
+
+.emotion-guide-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.52);
+}
+
+.emotion-guide-dialog__inner {
+  padding: 1rem 1.15rem 1.15rem;
+  max-height: min(90vh, 36rem);
+  overflow-y: auto;
+}
+
+.emotion-guide-dialog__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.emotion-guide-dialog__crumb {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--page-fg);
+  line-height: 1.35;
+}
+
+.emotion-guide-dialog__warn {
+  margin: 0 0 0.65rem;
+  padding: 0.45rem 0.55rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--page-fg);
+  background: rgba(255, 180, 72, 0.18);
+  border: 1px solid rgba(255, 180, 72, 0.35);
+  border-radius: 8px;
+}
+
+.emotion-guide-dialog__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.emotion-guide-dialog__field label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--muted);
+}
+
+.emotion-guide-dialog__textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.55rem;
+  color: var(--page-fg);
+  background: var(--control-bg);
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  resize: vertical;
+  min-height: 4rem;
+}
+
+.emotion-guide-dialog__textarea:focus-visible {
+  outline: 2px solid var(--accent-selected);
+  outline-offset: 2px;
+}
+
+.emotion-guide-dialog__count {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.emotion-guide-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+  align-items: center;
+}
+
+.emotion-guide-dialog__btn {
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.42rem 0.8rem;
+  cursor: pointer;
+  border-radius: 10px;
+  border: 1px solid var(--control-border);
+  background: var(--control-bg);
+  color: var(--control-fg);
+}
+
+.emotion-guide-dialog__btn:hover {
+  filter: brightness(1.06);
+}
+
+.emotion-guide-dialog__btn:focus-visible {
+  outline: 2px solid var(--accent-selected);
+  outline-offset: 2px;
+}
+
+.emotion-guide-dialog__btn--secondary {
+  font-weight: 550;
+}
+
 .wheel-mount .wheel-segment:focus {
   outline: none;
 }
@@ -454,8 +658,13 @@ body {
 .colors-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
   margin-top: 0.75rem;
+}
+
+.colors-actions #colors-close {
+  margin-left: auto;
 }
 
 .colors-actions__btn {
