@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ocean">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Feelings wheel</title>
+    <link rel="stylesheet" href="css/site.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="hero">
+      <div class="hero__toolbar">
+        <div class="toolbar-cluster">
+          <label class="theme-field">
+            <span id="theme-label" class="theme-field__label">Color scheme</span>
+            <select id="theme-select" aria-labelledby="theme-label">
+              <option value="ocean">Ocean</option>
+              <option value="sunset">Sunset</option>
+              <option value="forest">Forest</option>
+              <option value="mono">Mono</option>
+            </select>
+          </label>
+          <button type="button" id="colors-open" class="toolbar-btn" aria-haspopup="dialog" aria-controls="colors-dialog">
+            Colors
+          </button>
+        </div>
+      </div>
+
+      <div class="wheel-stage">
+        <div id="wheel-mount" class="wheel-mount" role="img" aria-label="Interactive feelings wheel"></div>
+        <p id="wheel-selection" class="wheel-selection sr-only" aria-live="polite"></p>
+      </div>
+
+      <p id="hero-title" class="hero__note" hidden>
+        Visualization inspired by common feelings-wheel formats — rebuilt for this site.
+      </p>
+    </header>
+
+    <main id="main" class="main">
+      <p class="main__placeholder" hidden>Your content can go here.</p>
+    </main>
+
+    <dialog id="colors-dialog" class="colors-dialog" aria-labelledby="colors-dialog-title">
+      <div class="colors-dialog__inner">
+        <h2 id="colors-dialog-title" class="colors-dialog__title">Customize colors</h2>
+        <p class="colors-dialog__hint">Changes apply live. Use the toolbar preset for wedge style; sliders override hue, saturation, and lightness until you switch preset.</p>
+
+        <form id="colors-form" class="colors-form">
+          <fieldset class="colors-fieldset">
+            <legend>Page</legend>
+            <label class="colors-row">
+              Page background <input type="color" id="color-pb" />
+            </label>
+            <label class="colors-row">
+              Hero top <input type="color" id="color-hb" />
+            </label>
+            <label class="colors-row">
+              Page text <input type="color" id="color-pf" />
+            </label>
+            <label class="colors-row">
+              Muted text <input type="color" id="color-mu" />
+            </label>
+          </fieldset>
+
+          <fieldset class="colors-fieldset">
+            <legend>Wheel frame</legend>
+            <label class="colors-row">
+              Stage tint <input type="color" id="color-ws" />
+            </label>
+            <label class="colors-row colors-row--range">
+              Stage opacity <input type="range" id="range-wa" min="0" max="100" />
+            </label>
+            <label class="colors-row">
+              Shadow color <input type="color" id="color-wd" />
+            </label>
+            <label class="colors-row colors-row--range">
+              Shadow opacity <input type="range" id="range-wo" min="0" max="100" />
+            </label>
+          </fieldset>
+
+          <fieldset class="colors-fieldset">
+            <legend>Wheel labels &amp; hub</legend>
+            <label class="colors-row">
+              Wedge outline <input type="color" id="color-ss" />
+            </label>
+            <label class="colors-row colors-row--range">
+              Outline opacity <input type="range" id="range-ssa" min="0" max="100" />
+            </label>
+            <label class="colors-row">
+              Center hub fill <input type="color" id="color-cf" />
+            </label>
+            <label class="colors-row">
+              Segment label ink <input type="color" id="color-st" />
+            </label>
+            <label class="colors-row">
+              Hub label ink <input type="color" id="color-ct" />
+            </label>
+            <div class="colors-row colors-row--radios" role="group" aria-label="Wheel label contrast">
+              <span class="colors-row__label">Quick label color</span>
+              <label><input type="radio" name="lw" id="lw-b" value="b" /> Black</label>
+              <label><input type="radio" name="lw" id="lw-w" value="w" /> White</label>
+              <label><input type="radio" name="lw" id="lw-custom" value="c" checked /> Custom (pickers above)</label>
+            </div>
+            <label class="colors-row">
+              Focus / selection ring <input type="color" id="color-af" />
+            </label>
+            <label class="colors-row colors-row--range">
+              Focus opacity <input type="range" id="range-aa" min="0" max="100" />
+            </label>
+          </fieldset>
+
+          <fieldset class="colors-fieldset">
+            <legend>Toolbar pill</legend>
+            <label class="colors-row">
+              Fill <input type="color" id="color-cg" />
+            </label>
+            <label class="colors-row colors-row--range">
+              Fill opacity <input type="range" id="range-cba" min="0" max="100" />
+            </label>
+            <label class="colors-row">
+              Border <input type="color" id="color-cn" />
+            </label>
+            <label class="colors-row colors-row--range">
+              Border opacity <input type="range" id="range-cna" min="0" max="100" />
+            </label>
+          </fieldset>
+
+          <fieldset class="colors-fieldset">
+            <legend>Wedge colors (preset + overrides)</legend>
+            <label class="colors-row colors-row--range">
+              Hue shift <input type="range" id="range-hu" min="0" max="359" />
+            </label>
+            <label class="colors-row colors-row--range">
+              Saturation <input type="range" id="range-sd" min="0" max="100" />
+            </label>
+            <label class="colors-row colors-row--range">
+              Lightness <input type="range" id="range-li" min="0" max="100" />
+            </label>
+          </fieldset>
+
+          <div class="colors-actions">
+            <button type="button" id="colors-copy-url" class="colors-actions__btn">Copy share URL</button>
+            <button type="button" id="colors-reset" class="colors-actions__btn colors-actions__btn--secondary">Reset to defaults</button>
+            <button type="button" id="colors-close" class="colors-actions__btn colors-actions__btn--secondary">Close</button>
+          </div>
+        </form>
+      </div>
+    </dialog>
+
+    <script src="js/wheel.js" type="module"></script>
+  </body>
+</html>

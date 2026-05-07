@@ -1,0 +1,130 @@
+{
+  "segments": [
+    {
+      "label": "Sad",
+      "children": [
+        {
+          "label": "Hurt",
+          "children": ["Embarrassed", "Disappointed", "Ashamed"]
+        },
+        {
+          "label": "Depressed",
+          "children": ["Empty", "Inferior", "Powerless"]
+        },
+        {
+          "label": "Guilty",
+          "children": ["Remorseful", "Ashamed", "Responsible"]
+        },
+        {
+          "label": "Lonely",
+          "children": ["Abandoned", "Victimized", "Fragile"]
+        }
+      ]
+    },
+    {
+      "label": "Mad",
+      "children": [
+        {
+          "label": "Hateful",
+          "children": ["Critical", "Dismissive", "Skeptical"]
+        },
+        {
+          "label": "Aggressive",
+          "children": ["Provoked", "Hostile", "Frustrated"]
+        },
+        {
+          "label": "Antagonistic",
+          "children": ["Hateful", "Self-righteous", "Irritated"]
+        },
+        {
+          "label": "Withdrawn",
+          "children": ["Resistant", "Critical", "Dismissive"]
+        }
+      ]
+    },
+    {
+      "label": "Scared",
+      "children": [
+        {
+          "label": "Rejected",
+          "children": ["Betrayed", "Dismissed", "Alienated"]
+        },
+        {
+          "label": "Weak",
+          "children": ["Worthless", "Insignificant", "Inadequate"]
+        },
+        {
+          "label": "Threatened",
+          "children": ["Exposed", "Nervous", "Worried"]
+        },
+        {
+          "label": "Unsure",
+          "children": ["Dismissive", "Disorganized", "Uncertain"]
+        }
+      ]
+    },
+    {
+      "label": "Joyful",
+      "children": [
+        {
+          "label": "Excited",
+          "children": ["Sensuous", "Energized", "Hopeful"]
+        },
+        {
+          "label": "Creative",
+          "children": ["Inspired", "Hopeful", "Playful"]
+        },
+        {
+          "label": "Sensitive",
+          "children": ["Aware", "Joyful", "Thankful"]
+        },
+        {
+          "label": "Intimate",
+          "children": ["Accepted", "Important", "Peaceful"]
+        }
+      ]
+    },
+    {
+      "label": "Powerful",
+      "children": [
+        {
+          "label": "Faithful",
+          "children": ["Confident", "Appreciated", "Hopeful"]
+        },
+        {
+          "label": "Hopeful",
+          "children": ["Expectant", "Inspired", "Important"]
+        },
+        {
+          "label": "Proud",
+          "children": ["Trusting", "Successful", "Confident"]
+        },
+        {
+          "label": "Respected",
+          "children": ["Valued", "Appreciated", "Important"]
+        }
+      ]
+    },
+    {
+      "label": "Peaceful",
+      "children": [
+        {
+          "label": "Thoughtful",
+          "children": ["Reflective", "Apologetic", "Thankful"]
+        },
+        {
+          "label": "Intimate",
+          "children": ["Thankful", "Trusting", "Loving"]
+        },
+        {
+          "label": "Trusting",
+          "children": ["Sensitive", "Hopeful", "Intimate"]
+        },
+        {
+          "label": "Nurturing",
+          "children": ["Considerate", "Kind", "Friendly"]
+        }
+      ]
+    }
+  ]
+}
