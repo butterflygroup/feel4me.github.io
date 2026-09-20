@@ -1,4 +1,166 @@
 {
+  "Sad › Hurt › Embarrassed": {
+    "feel": "Exposed and self-conscious — replaying the moment and wishing you could disappear or take it back.",
+    "body": "Hot face or blushing, averted eyes, a nervous laugh, shrinking posture, or a sudden urge to leave the room.",
+    "call": "A call to remember that everyone stumbles in public sometimes — and to treat your own slip the way you would treat a friend's.",
+    "overcome": "Breathe out slowly and let the flush pass; tell the story to someone safe; ask whether anyone will remember this in a month; find the humor when you're ready."
+  },
+  "Sad › Hurt › Disappointed": {
+    "feel": "Let down and deflated — something you hoped for didn't happen, and the gap between what you pictured and what is stings.",
+    "body": "A sinking feeling in the stomach, heavy sighs, drooping shoulders, low energy, or a lump in the throat.",
+    "call": "A call to honor what you were hoping for — disappointment points at something that matters to you — and to adjust expectations without abandoning the hope underneath.",
+    "overcome": "Name exactly what you expected; let yourself be sad about it before trying to fix it; separate what you can still influence from what you can't; if a person is involved, tell them plainly and without blame."
+  },
+  "Sad › Hurt › Ashamed": {
+    "feel": "Small and wounded — as if someone's words or actions revealed something wrong with you, and you want to hide.",
+    "body": "Head down, eyes lowered, heat in the face or chest, a caved-in posture, or going quiet and still.",
+    "call": "A call to separate what was said or done to you from who you are — hurt that turns into shame usually needs compassion, not correction.",
+    "overcome": "Tell the story to someone who has earned your trust — shame shrinks when spoken; ask whose voice the criticism really is; write yourself the note a kind friend would send; consider counseling if the shame is old and deep."
+  },
+  "Sad › Depressed › Empty": {
+    "feel": "Hollow and flat — not sad exactly, just nothing. Things that used to matter feel distant or gray.",
+    "body": "Heaviness in the limbs, fatigue that sleep doesn't fix, changes in appetite, a blank stare, or moving on autopilot.",
+    "call": "A call to take the low seriously and let yourself be cared for — emptiness is often exhaustion, grief, or depression asking for attention, not a verdict on your life.",
+    "overcome": "Keep the basics going: food, water, daylight, sleep; do one small thing that used to help, without expecting to enjoy it yet; tell one person how flat things feel; if it lasts more than two weeks, or you have thoughts of not being here, contact a doctor, therapist, or crisis line."
+  },
+  "Sad › Depressed › Inferior": {
+    "feel": "Less than — everyone else seems more capable, more attractive, or further along, and you keep measuring yourself against them and losing.",
+    "body": "Slumped shoulders, avoiding eye contact, a tight stomach around certain people, a quiet voice, or shrinking to take up less space.",
+    "call": "A call to step out of the comparison and back into your own lane — your worth isn't a ranking.",
+    "overcome": "Notice who and what triggers the comparing, and limit it; list strengths other people have actually named in you; compare yourself only to where you were a year ago; spend time with people who don't keep score."
+  },
+  "Sad › Depressed › Powerless": {
+    "feel": "Stuck and defeated — as though nothing you do will change anything, so why try.",
+    "body": "A heavy body, low motivation, shallow breathing, slowed movement, or a collapsed, giving-up posture.",
+    "call": "A call to find the smallest lever you still hold — and to ask for help with what is truly beyond you.",
+    "overcome": "Sort the situation into what you control, what you influence, and what you don't; take one tiny action in the first column today; ask someone to help with the rest; if hopelessness persists, talk with a professional."
+  },
+  "Sad › Guilty › Remorseful": {
+    "feel": "Deep regret — you wish you could undo what you did, and you keep seeing its effect on someone else.",
+    "body": "An ache in the chest, a knot in the stomach, trouble sleeping, replaying the scene, or tearfulness.",
+    "call": "A call to repair — remorse is conscience working as intended, pointing you toward making it right.",
+    "overcome": "Offer a specific apology with no 'but'; ask what would help, then do it; decide what you'll do differently and write it down; once you've made amends, allow yourself to be forgiven."
+  },
+  "Sad › Guilty › Ashamed": {
+    "feel": "Not just 'I did something bad' but 'I am bad' — the mistake feels like proof of who you really are.",
+    "body": "Wanting to hide, heat in the face, avoiding people's eyes, a sick feeling in the stomach, or harsh self-talk on a loop.",
+    "call": "A call to move from shame back to guilt — from 'I am wrong' to 'I did wrong' — because only the second can be repaired.",
+    "overcome": "Name the specific action, not your whole character; make amends where you can; speak to yourself as you would to someone you love who made the same mistake; share it with one trusted person or a counselor."
+  },
+  "Sad › Guilty › Responsible": {
+    "feel": "Weighed down — it feels like it was on you, and you're carrying the outcome whether or not it was truly yours to carry.",
+    "body": "Tight shoulders and neck, a clenched jaw, restless sleep, a heavy chest, or difficulty relaxing.",
+    "call": "A call to sort out what is actually yours — to own your part fully and hand back the rest.",
+    "overcome": "Write down what was in your control and what wasn't; act on your share — apologize, fix, learn; ask a level-headed friend whether your sense of blame is accurate; practice saying 'that part wasn't mine.'"
+  },
+  "Sad › Lonely › Abandoned": {
+    "feel": "Left behind — someone who should have stayed didn't, and their absence feels like an ache or a verdict.",
+    "body": "A hollow chest, tearfulness, panic or clinginess when people leave, trouble sleeping, or reaching for the phone again and again.",
+    "call": "A call to grieve who left, and to turn toward the people who are still here — including yourself.",
+    "overcome": "Let yourself mourn without rushing; reach out to one steady person today; keep small promises to yourself to rebuild trust; if old abandonment keeps replaying in new relationships, a therapist can help untangle it."
+  },
+  "Sad › Lonely › Victimized": {
+    "feel": "Wronged and unprotected — something unfair was done to you, and it may feel like no one saw it or stood up for you.",
+    "body": "A tense, guarded body, jumpiness, stomach upset, tears or anger close to the surface, or exhaustion.",
+    "call": "A call to have your experience believed and your safety restored — and, in time, to reclaim your own sense of agency.",
+    "overcome": "Tell someone you trust what happened; write down the facts; if you were harmed or are unsafe, contact appropriate support — a counselor, an advocate, HR, or the authorities; notice the choices you do still have, however small."
+  },
+  "Sad › Lonely › Fragile": {
+    "feel": "Breakable — like one more hard thing could crack you, and you need the world to be gentle right now.",
+    "body": "Tears close to the surface, sensitivity to noise or tone of voice, fatigue, shakiness, or a lump in the throat.",
+    "call": "A call to lower the load and accept care — fragility is a signal to protect your energy, not a permanent state.",
+    "overcome": "Cancel what can be cancelled; tell the people close to you that you're tender right now; choose gentle inputs — quiet, warmth, sleep, soft company; rebuild slowly, one manageable thing at a time."
+  },
+  "Mad › Hateful › Critical": {
+    "feel": "Sharp and fault-finding — you see exactly what is wrong with someone, and contempt has started to color the list.",
+    "body": "Narrowed eyes, tight lips, a clenched jaw, a hard tone of voice, or tension across the forehead.",
+    "call": "A call to find the standard or value underneath the criticism — and to ask for what you want instead of attacking what you don't.",
+    "overcome": "Turn the complaint into a request; name one thing the person does right; ask whether you're this harsh with yourself too; pause before saying or sending the cutting thing."
+  },
+  "Mad › Hateful › Dismissive": {
+    "feel": "Cold and done — the person or idea seems beneath your attention, not worth the energy of a real response.",
+    "body": "Eye-rolling, turning away, a flat or sarcastic tone, crossed arms, or a short exhale through the nose.",
+    "call": "A call to notice what you're refusing to take in — contempt often guards a hurt or a fear of being wrong.",
+    "overcome": "Ask one genuine question before deciding; name the hurt beneath the contempt; if distance truly is needed, set a boundary directly instead of writing the person off; remember a time you were dismissed and how it landed."
+  },
+  "Mad › Hateful › Skeptical": {
+    "feel": "Distrustful and unconvinced — you suspect a hidden motive and you're braced against being fooled.",
+    "body": "A raised eyebrow, crossed arms, leaning back, a tight jaw, or scanning for the catch.",
+    "call": "A call to protect yourself wisely — to check facts and let trust be earned in steps, without deciding in advance that everyone is lying.",
+    "overcome": "Ask for evidence rather than assuming; separate this person from whoever burned you before; extend a small test of trust and see what happens; notice when doubt has become a wall rather than a filter."
+  },
+  "Mad › Aggressive › Provoked": {
+    "feel": "Pushed — someone hit a nerve, maybe on purpose, and everything in you wants to hit back.",
+    "body": "A rush of heat, a pounding heart, clenched fists, a tight chest, or words rising fast to your mouth.",
+    "call": "A call to choose your response rather than hand it to the person who poked you.",
+    "overcome": "Take one slow breath out before speaking; step away for ten minutes if you can; name exactly what got to you and why; respond later, when you can say it without wanting to wound."
+  },
+  "Mad › Aggressive › Hostile": {
+    "feel": "Ready for a fight — other people look like opponents, and you're leaning toward attack in words or actions.",
+    "body": "Tense muscles, a flushed face, a loud or clipped voice, glaring, pacing, or an urge to throw or strike something.",
+    "call": "A call to get safe and get calm first — and then to find the threat or hurt that the hostility is defending.",
+    "overcome": "Leave the situation before it escalates; burn off the energy physically — walk fast, run, push against a wall; don't drive, text, or make decisions while flooded; if hostility is frequent, or frightens you or others, seek anger-management support."
+  },
+  "Mad › Aggressive › Frustrated": {
+    "feel": "Blocked — you keep trying and it keeps not working, and your patience is wearing thin.",
+    "body": "Sighing, clenched teeth, tight shoulders, restless hands, a headache building, or an urge to quit or slam something.",
+    "call": "A call to change the approach, not just push harder — frustration marks the gap between effort and result.",
+    "overcome": "Step away and come back fresh; name the exact obstacle; ask for help or a second pair of eyes; shrink the goal to the next doable step; check whether you're tired, hungry, or rushed."
+  },
+  "Mad › Antagonistic › Hateful": {
+    "feel": "Consumed by intense dislike — you want the other person to lose, hurt, or disappear, and it takes up a lot of room inside you.",
+    "body": "A burning chest or stomach, a clenched jaw, tight fists, trouble sleeping, or replaying the same scenes.",
+    "call": "A call to tend the wound beneath the hate — it usually grows from deep hurt, fear, or injustice — and to protect yourself without being poisoned by it.",
+    "overcome": "Name what was done and what it cost you; put distance between you and the person if needed; move the energy through exercise or an unsent letter; talk it through with a counselor if it won't loosen; never act on urges to harm someone — reach out for help instead."
+  },
+  "Mad › Antagonistic › Self-righteous": {
+    "feel": "Certain and superior — you're right, they're wrong, and you feel justified in letting them know it.",
+    "body": "A lifted chin, a rigid spine, a lecturing tone, a tight chest, or energy that surges when you argue.",
+    "call": "A call to hold your values with humility — being right and being kind are not opposites.",
+    "overcome": "Ask what you might be missing; state your view once, without the sermon; get curious about how the other person arrived at theirs; notice whether winning is costing you the relationship."
+  },
+  "Mad › Antagonistic › Irritated": {
+    "feel": "Prickly and on edge — small things grate, and your tolerance is thinner than usual.",
+    "body": "A tight jaw, a furrowed brow, short breaths, snappy replies, or sensitivity to noise and interruption.",
+    "call": "A call to check your reserves — irritation is often a sign that a need (rest, food, quiet, space) has gone unmet.",
+    "overcome": "Run the basics: sleep, food, water, a break; remove one irritant you can control; tell people you're short-fused so they don't take it personally; address the recurring annoyance directly rather than letting it pile up."
+  },
+  "Mad › Withdrawn › Resistant": {
+    "feel": "Dug in — you don't want to go along, and the more you're pushed the more you pull back.",
+    "body": "Crossed arms, a set jaw, heavy limbs, slow-walking tasks, or a quiet 'no' held in the body.",
+    "call": "A call to find the 'no' inside your resistance and say it directly — there's usually a boundary or a fear that hasn't been voiced.",
+    "overcome": "Ask yourself what you're protecting; state your objection in words instead of in delay; negotiate the part you can't accept; notice whether you're resisting the person rather than the request."
+  },
+  "Mad › Withdrawn › Critical": {
+    "feel": "Silently judging — you've pulled away and are keeping a private tally of what others are doing wrong.",
+    "body": "A tight mouth, averted eyes, sighing, a cool distance, or tension in the neck and shoulders.",
+    "call": "A call to bring the unspoken complaint into the open, where it can actually be resolved.",
+    "overcome": "Pick the one issue that matters most and raise it kindly; say 'I need' instead of 'you always'; check whether your expectations were ever spoken aloud; let the small stuff go on purpose."
+  },
+  "Mad › Withdrawn › Dismissive": {
+    "feel": "Shut down and waving it off — 'whatever,' 'it's fine' — because engaging feels pointless or too risky.",
+    "body": "Shrugging, a flat voice, looking at your phone, a numb or closed-off chest, or physically leaving the room.",
+    "call": "A call to admit that it does matter — brushing things off keeps you safe but also keeps you unheard.",
+    "overcome": "Finish the sentence 'What actually bothers me is…'; ask for a time to talk once you've cooled down; say one honest thing instead of 'fine'; notice who you feel safe enough not to dismiss."
+  },
+  "Scared › Rejected › Betrayed": {
+    "feel": "Stunned and wounded — someone you trusted broke that trust, and you're questioning what else wasn't real.",
+    "body": "A punch-in-the-gut sensation, nausea, shaking, racing thoughts, trouble sleeping, or swinging between numbness and anger.",
+    "call": "A call to protect yourself and take trust seriously — to let it be rebuilt by actions over time, or to let the relationship change.",
+    "overcome": "Give yourself time before big decisions; get the facts you need; say clearly what the breach cost you; lean on people who have proven reliable; decide slowly whether repair is possible and what it would require."
+  },
+  "Scared › Rejected › Dismissed": {
+    "feel": "Brushed aside — you spoke up or showed up, and it was treated as if it didn't count.",
+    "body": "A drop in the stomach, heat in the face, a tight throat, going quiet, or an urge to withdraw.",
+    "call": "A call to trust that your voice is worth hearing — and to say it again, or to say it somewhere it will be received.",
+    "overcome": "Restate your point calmly — 'I'd like to finish'; ask directly for a response; check whether this is a pattern with this person or a one-off; invest in rooms where you are listened to."
+  },
+  "Scared › Rejected › Alienated": {
+    "feel": "On the outside — cut off from a group, or from people in general, as if you don't belong anywhere.",
+    "body": "A heavy chest, guardedness in social settings, fatigue after masking, or a constant low-level tension.",
+    "call": "A call to seek belonging where you can be yourself — you may need a different room, not a different you.",
+    "overcome": "Look for one person or community built around a genuine interest; risk a small honest disclosure; limit time in spaces that require you to pretend; reconnect with someone who already knows you well."
+  },
   "Scared › Weak › Worthless": {
     "feel": "Heavy, hollow, or invisible — as if nothing you do carries weight or matters.",
     "body": "Low energy, slumped posture, tight chest or throat, shallow breathing, or feeling numb and disconnected.",
@@ -16,5 +178,257 @@
     "body": "Racing thoughts, difficulty sleeping, clenched hands, fatigue after hyper-focus, or avoiding tasks entirely.",
     "call": "A call to separate identity from output — adequacy as growth and honesty rather than flawless performance.",
     "overcome": "Break tasks into absurdly small steps; ask \"good enough for today\"; share unfinished work with one safe colleague or friend; challenge all-or-nothing thoughts on paper."
+  },
+  "Scared › Threatened › Exposed": {
+    "feel": "Unprotected and seen in a way you didn't choose — as if your weak spot is showing and anyone could strike it.",
+    "body": "A racing heart, flushed skin, an urge to cover up or flee, shaky hands, or hyper-awareness of being watched.",
+    "call": "A call to restore your sense of safety, and to choose for yourself what you share, with whom, and when.",
+    "overcome": "Move toward a place or person that feels safe; ask whether the danger is real or remembered; set a boundary about what you'll discuss; share vulnerable things gradually, with people who've shown care."
+  },
+  "Scared › Threatened › Nervous": {
+    "feel": "Jittery and keyed up — something is coming and you're not sure you're ready.",
+    "body": "Butterflies, sweaty palms, a shaky voice, fidgeting, a quick heartbeat, or frequent trips to the bathroom.",
+    "call": "A call to prepare and then trust your preparation — nerves are energy showing up for something that matters.",
+    "overcome": "Breathe out longer than you breathe in; rehearse the first thirty seconds; move your body to use up the adrenaline; try telling yourself 'I'm excited' — the sensations are nearly identical; ease off the caffeine."
+  },
+  "Scared › Threatened › Worried": {
+    "feel": "Caught in 'what if' — your mind keeps running ahead to the things that could go wrong.",
+    "body": "Tense shoulders, a knotted stomach, trouble falling asleep, a furrowed brow, or restlessness.",
+    "call": "A call to turn worry into a plan where you can, and to practice setting it down where you can't.",
+    "overcome": "Write the worries down and mark which are solvable; take one step on those; set a ten-minute 'worry time' and postpone the rest until then; come back to the present through your senses; seek support if worry is constant or gets in the way of daily life."
+  },
+  "Scared › Unsure › Dismissive": {
+    "feel": "Waving it away — acting like it doesn't matter, because admitting that it does would mean facing how unsure you feel.",
+    "body": "A forced shrug or laugh, quick changes of subject, shallow breath, or a flutter of unease you keep pushing down.",
+    "call": "A call to be honest about what you're avoiding — the thing you brush off is often the thing that scares you.",
+    "overcome": "Ask 'If I did care about this, what would I be afraid of?'; admit the uncertainty to one person; take one small look at the thing you've been avoiding; swap 'it doesn't matter' for 'I don't know yet.'"
+  },
+  "Scared › Unsure › Disorganized": {
+    "feel": "Scattered and overwhelmed — too many pieces, no clear starting point, and a fear of dropping something important.",
+    "body": "Racing thoughts, darting attention, a tight chest, starting many things and finishing none, or freezing in place.",
+    "call": "A call to slow down and create a little order — clarity usually follows one written list, not more speed.",
+    "overcome": "Get everything out of your head and onto paper; pick the top three and ignore the rest for now; clear one physical surface; work in a single 20-minute block; ask someone to help you prioritize."
+  },
+  "Scared › Unsure › Uncertain": {
+    "feel": "In limbo — you don't know what will happen or which way to go, and the not-knowing is its own discomfort.",
+    "body": "A fluttery stomach, shallow breathing, restlessness, trouble concentrating, or seeking reassurance again and again.",
+    "call": "A call to tolerate not knowing for a while — to take the next small step without needing the whole map.",
+    "overcome": "List what you do know and what you need to find out; set a date to decide rather than deciding under pressure; choose a small, reversible step; remind yourself of past uncertainty you got through."
+  },
+  "Joyful › Excited › Sensuous": {
+    "feel": "Alive in your senses — taste, touch, sound, and sight feel vivid and deeply pleasurable.",
+    "body": "Warm, relaxed skin, slower breathing, heightened sensation, lingering over textures and flavors, or a pleasant tingling.",
+    "call": "A call to inhabit your body and savor — pleasure is a legitimate part of a good life, not a distraction from it.",
+    "overcome": "Slow down one meal, shower, or walk and notice every sense; put on music that moves you; spend time in nature; share physical affection with presence and consent."
+  },
+  "Joyful › Excited › Energized": {
+    "feel": "Charged up and ready — motivated, capable, and keen to get moving.",
+    "body": "A quick, light step, bright eyes, a faster heartbeat, a louder voice, or an urge to move and do.",
+    "call": "A call to put the energy toward something that matters to you while it's here.",
+    "overcome": "Start the project you've been putting off; move your body; share the momentum with someone; protect sleep and meals so the energy lasts instead of crashing."
+  },
+  "Joyful › Excited › Hopeful": {
+    "feel": "Buzzing with anticipation — something good is on the horizon and you can hardly wait.",
+    "body": "A fluttery chest, smiling without meaning to, restless energy, or trouble sitting still.",
+    "call": "A call to let yourself look forward fully, without bracing for disappointment in advance.",
+    "overcome": "Tell someone what you're looking forward to; take one step that brings it closer; enjoy the anticipation as part of the gift; hold the outcome loosely."
+  },
+  "Joyful › Creative › Inspired": {
+    "feel": "Lit up by an idea — possibilities are arriving faster than you can catch them.",
+    "body": "A rush of energy in the chest, wide eyes, quick thinking, losing track of time, or itching to make something.",
+    "call": "A call to make — to give the idea form before the spark cools.",
+    "overcome": "Capture it right now — notes, a sketch, a voice memo; block out an uninterrupted hour; share it with someone who'll encourage it; return to whatever sparked it — books, walks, conversations, art."
+  },
+  "Joyful › Creative › Hopeful": {
+    "feel": "Open to possibility — you can picture something that doesn't exist yet and believe you could help make it real.",
+    "body": "A light, expansive chest, easy breathing, daydreaming, or an upward gaze.",
+    "call": "A call to treat your imagination as a guide, and to take the vision seriously enough to begin.",
+    "overcome": "Write the vision down in detail; make a rough first version; find others who are building similar things; keep a record of the ideas that did come to life."
+  },
+  "Joyful › Creative › Playful": {
+    "feel": "Light and mischievous — in the mood to joke, experiment, and not take things too seriously.",
+    "body": "Laughter, a loose and bouncy body, a grin, a sing-song voice, or spontaneous movement.",
+    "call": "A call to play for its own sake — it restores you and connects you with others.",
+    "overcome": "Say yes to a game or a silly idea; spend time with kids, pets, or your funniest friend; try something you're bad at just for fun; schedule some unstructured time."
+  },
+  "Joyful › Sensitive › Aware": {
+    "feel": "Tuned in — noticing details, moods, and beauty that you'd normally rush past.",
+    "body": "Calm alertness, slower breathing, soft and wide vision, stillness, or goosebumps at small things.",
+    "call": "A call to be present — this moment is where your life is actually happening.",
+    "overcome": "Pause and name five things you can sense; put the phone away for an hour; keep a short noticing journal; practice meditation or slow walks."
+  },
+  "Joyful › Sensitive › Joyful": {
+    "feel": "Simply glad — a bright, uncomplicated happiness that doesn't need a reason.",
+    "body": "Smiling, warmth in the chest, a light body, easy laughter, or humming and singing.",
+    "call": "A call to receive joy without questioning it or waiting for the other shoe to drop.",
+    "overcome": "Stay in it a few breaths longer than usual; say out loud 'this is good'; share it with someone; take a mental snapshot to return to on harder days."
+  },
+  "Joyful › Sensitive › Thankful": {
+    "feel": "Touched — moved by something good that you received and didn't have to earn.",
+    "body": "Warmth in the chest, soft eyes, a gentle smile, tears of gladness, or a relaxed exhale.",
+    "call": "A call to notice and name the good — gratitude grows what it pays attention to.",
+    "overcome": "Tell the person specifically what they did and what it meant; write down three good things tonight; pass a kindness on; revisit the list when things feel scarce."
+  },
+  "Joyful › Intimate › Accepted": {
+    "feel": "Welcomed as you are — no performance needed, and no part of you has to be hidden.",
+    "body": "Dropped shoulders, easy breathing, a relaxed face, open posture, or a sense of coming home.",
+    "call": "A call to let yourself be known, and to offer others the same welcome.",
+    "overcome": "Spend more time with the people who make you feel this way; tell them it matters; share a little more of yourself; practice accepting yourself the way they accept you."
+  },
+  "Joyful › Intimate › Important": {
+    "feel": "Cherished — you matter to someone, and your presence makes a difference to them.",
+    "body": "Warmth in the chest, standing a little taller, a steady gaze, or a quiet glow.",
+    "call": "A call to believe that you matter to the people who love you, and to show them they matter too.",
+    "overcome": "Take the compliment or gesture in instead of deflecting it; show up for those who show up for you; tell someone why they're important to you; keep the notes and messages that remind you."
+  },
+  "Joyful › Intimate › Peaceful": {
+    "feel": "Content and close — nothing needs to be said or fixed; being together is enough.",
+    "body": "Slow breathing, soft muscles, a settled stomach, comfortable silence, or a drowsy warmth.",
+    "call": "A call to rest in connection — closeness doesn't always need words or activity.",
+    "overcome": "Protect unhurried time with people you love; share quiet activities — a walk, cooking, reading side by side; put devices away; notice the moment and say 'I love this.'"
+  },
+  "Powerful › Faithful › Confident": {
+    "feel": "Steady and assured — you trust that you, or something larger than you, can carry this.",
+    "body": "An upright but relaxed posture, even breathing, a steady voice, grounded feet, or a calm gaze.",
+    "call": "A call to act from trust instead of fear — to take the step your convictions point toward.",
+    "overcome": "Recall times your faith or values held under pressure; keep the practices that ground you — prayer, reflection, community; take one brave action today; encourage someone who is wavering."
+  },
+  "Powerful › Faithful › Appreciated": {
+    "feel": "Seen for your loyalty — your steadiness and commitment have been noticed and valued.",
+    "body": "Warmth in the chest, a genuine smile, relaxed shoulders, or a swell of quiet pride.",
+    "call": "A call to receive thanks fully and let it renew your commitment.",
+    "overcome": "Let the thanks land — just say 'thank you'; notice the faithfulness of others and tell them; keep showing up in the ways that matter; remember this on days when your effort goes unseen."
+  },
+  "Powerful › Faithful › Hopeful": {
+    "feel": "Trusting that things will work out — not because you can see how, but because you believe in what you're standing on.",
+    "body": "A calm chest, a lifted gaze, unhurried breathing, or a sense of being held steady.",
+    "call": "A call to keep going with patience — to let hope, not fear, set your direction.",
+    "overcome": "Return to the words, stories, or people that strengthen your hope; look back at what you've already come through; do today's part and leave tomorrow's; offer hope to someone who is running low."
+  },
+  "Powerful › Hopeful › Expectant": {
+    "feel": "Leaning forward — you're anticipating something good and getting ready to meet it.",
+    "body": "Alertness, a quickened pulse, bright eyes, energized restlessness, or frequent checking for news.",
+    "call": "A call to prepare for the good you're expecting — readiness is part of receiving it.",
+    "overcome": "Make practical preparations; picture it going well, in detail; channel the waiting energy into something useful; stay flexible about the timing and the form it takes."
+  },
+  "Powerful › Hopeful › Inspired": {
+    "feel": "Uplifted and moved to act — someone or something has shown you what's possible, and you want to rise to it.",
+    "body": "A full chest, goosebumps, a lump of emotion in the throat, surging energy, or an upright stance.",
+    "call": "A call to turn admiration into action — to become a little more like what moved you.",
+    "overcome": "Name exactly what inspired you and why; choose one concrete step in that direction this week; learn more about the person or idea; tell them, if you can, what they sparked."
+  },
+  "Powerful › Hopeful › Important": {
+    "feel": "Significant — you sense that you have a part to play and that your contribution is needed.",
+    "body": "A straight back, a purposeful stride, focused attention, a steady voice, or a settled strength in your core.",
+    "call": "A call to step into your role with both confidence and humility.",
+    "overcome": "Clarify what is yours to do and do it well; say yes to responsibility that fits your gifts; remember that importance is about service, not status; help someone else find their part."
+  },
+  "Powerful › Proud › Trusting": {
+    "feel": "Secure in your own judgment — you've earned your own trust, and you can rely on yourself and your people.",
+    "body": "A relaxed, open chest, an unhurried pace, a steady gaze, or ease in making decisions.",
+    "call": "A call to back yourself — and to extend trust to others from a place of strength rather than need.",
+    "overcome": "Keep the small promises you make to yourself; make a decision without polling everyone; delegate something and let it go; acknowledge the people who've proven dependable."
+  },
+  "Powerful › Proud › Successful": {
+    "feel": "Accomplished — you set out to do something, you did it, and the satisfaction is real.",
+    "body": "A broad smile, a lifted chest, a surge of energy or happy relief, a fist pump, or a deep contented exhale.",
+    "call": "A call to celebrate and absorb the win before rushing to the next goal.",
+    "overcome": "Mark the moment — tell someone, take the photo, have the dinner; write down what worked so you can repeat it; thank the people who helped; rest before you set the next target."
+  },
+  "Powerful › Proud › Confident": {
+    "feel": "Capable and self-assured — you know what you bring, and you don't need to prove it or hide it.",
+    "body": "Shoulders back, head up, a clear and steady voice, easy eye contact, or relaxed, deliberate movement.",
+    "call": "A call to use your strengths fully and generously.",
+    "overcome": "Take on a challenge that stretches you; keep a record of the evidence — wins, feedback, skills; mentor someone; stay teachable so confidence doesn't harden into arrogance."
+  },
+  "Powerful › Respected › Valued": {
+    "feel": "Worth something to others — your ideas, work, and presence are wanted and make a difference.",
+    "body": "A warm chest, relaxed shoulders, an easy smile, or a settled sense of having a place.",
+    "call": "A call to keep offering what is genuinely yours to give — and to know your worth even when it isn't reflected back.",
+    "overcome": "Notice specifically what people value in you and do more of it; choose environments that treat you this way; tell others what you value in them; hold onto this when you negotiate or set boundaries."
+  },
+  "Powerful › Respected › Appreciated": {
+    "feel": "Recognized — someone noticed your effort and said so, and it feels good to be acknowledged.",
+    "body": "A smile you can't hold back, warmth in the face, a lighter step, or a little glow of energy.",
+    "call": "A call to take in recognition rather than deflect it — and to become someone who notices others.",
+    "overcome": "Reply with a simple 'thank you, that means a lot'; save kind messages for low days; make appreciation a habit — thank one person specifically each day; appreciate your own effort too."
+  },
+  "Powerful › Respected › Important": {
+    "feel": "Held in high regard — people listen when you speak and look to you for direction.",
+    "body": "An upright posture, a calm and measured voice, steady eye contact, or a grounded stillness.",
+    "call": "A call to use your influence responsibly — respect is a trust to be honored.",
+    "overcome": "Listen more than your position requires; use your voice for people who have less of one; stay honest about your limits and mistakes; keep earning the respect you've been given."
+  },
+  "Peaceful › Thoughtful › Reflective": {
+    "feel": "Quiet and inward — turning things over calmly, making sense of where you've been and where you're going.",
+    "body": "Slow, deep breathing, a soft gaze into the distance, stillness, or a relaxed brow.",
+    "call": "A call to make room for stillness — understanding arrives when you stop rushing past your own life.",
+    "overcome": "Journal without editing; take a walk with no headphones; ask 'What is this season teaching me?'; protect a regular pocket of quiet in your week."
+  },
+  "Peaceful › Thoughtful › Apologetic": {
+    "feel": "Softened and willing — you see your part clearly and want to make things right, without being crushed by it.",
+    "body": "A lowered, open posture, a gentle voice, a tender chest, or a release of tension once you decide to apologize.",
+    "call": "A call to repair the connection — a sincere apology is strength, not weakness.",
+    "overcome": "Say it soon and plainly: what you did, how it affected them, what you'll change; listen to their response without defending yourself; follow through; forgive yourself once you've made amends."
+  },
+  "Peaceful › Thoughtful › Thankful": {
+    "feel": "Quietly grateful — looking back, you can see how much you've been given and how far you've come.",
+    "body": "A full, warm chest, a slow contented breath, a soft smile, or moist eyes.",
+    "call": "A call to remember — gratitude ties the good of the past to the present moment.",
+    "overcome": "Write a letter to someone who shaped you; keep a running gratitude list; tell the story of a hard time and who helped you through it; say grace, in whatever form fits you."
+  },
+  "Peaceful › Intimate › Thankful": {
+    "feel": "Grateful for someone — struck by how good it is to have this person in your life.",
+    "body": "Warmth spreading through the chest, soft eye contact, an urge to hug or hold a hand, or a relaxed closeness.",
+    "call": "A call to say it — don't assume the people you love know how much they mean to you.",
+    "overcome": "Tell them today, specifically; write it down for them to keep; show it in their language — time, help, touch, words, or a small gift; notice the ordinary things they do."
+  },
+  "Peaceful › Intimate › Trusting": {
+    "feel": "Safe with someone — you can let your guard down and be yourself without fear.",
+    "body": "Relaxed muscles, deep and easy breathing, comfortable eye contact and touch, or a feeling of being able to rest.",
+    "call": "A call to go deeper — trust is an invitation to be more fully known.",
+    "overcome": "Share something a little more vulnerable; be reliable in return — keep confidences and promises; say 'I trust you' out loud; repair small ruptures quickly so trust stays strong."
+  },
+  "Peaceful › Intimate › Loving": {
+    "feel": "Full of warmth and care — you want good things for someone, and giving to them feels like a joy rather than an effort.",
+    "body": "An open, warm chest, a soft face and voice, a desire to be close, a slower heartbeat, or gentle touch.",
+    "call": "A call to express love in action, and to let yourself receive it in return.",
+    "overcome": "Say 'I love you' and why; give your undivided attention; do a small unprompted kindness; extend the same warmth to yourself."
+  },
+  "Peaceful › Trusting › Sensitive": {
+    "feel": "Open and tender — safe enough to feel things deeply, and to be moved by other people's feelings too.",
+    "body": "A soft chest, tears that come easily, attunement to tone and expression, or a gentle, unguarded posture.",
+    "call": "A call to value your tenderness as a strength — it's what allows real empathy and connection.",
+    "overcome": "Spend time with people who treat your sensitivity kindly; use it — listen well, create, comfort; balance openness with rest and boundaries; stop apologizing for feeling deeply."
+  },
+  "Peaceful › Trusting › Hopeful": {
+    "feel": "At ease about the future — a quiet confidence that things will be okay, and that you don't have to force them.",
+    "body": "Loose shoulders, slow breathing, a light chest, restful sleep, or an easy smile.",
+    "call": "A call to let go of the need to control every outcome, and to rest in trust.",
+    "overcome": "Name what you're entrusting, and to whom; release one thing you've been gripping tightly; keep company with hopeful, grounded people; end the day by listing what went right."
+  },
+  "Peaceful › Trusting › Intimate": {
+    "feel": "Deeply close — known and knowing, with nothing to hide and no need to hurry.",
+    "body": "Relaxed closeness, synchronized breathing, comfortable silence, soft eye contact, or warmth throughout the body.",
+    "call": "A call to treasure and tend this closeness — it's rare, and it grows with attention.",
+    "overcome": "Make regular undistracted time together; keep asking real questions; share appreciations often; protect the relationship's privacy and its rituals."
+  },
+  "Peaceful › Nurturing › Considerate": {
+    "feel": "Attentive to others — you're thinking about what they might need, and you're glad to make room for it.",
+    "body": "A calm, unhurried presence, soft attention, relaxed and open hands, or a gentle tone.",
+    "call": "A call to practice thoughtful care — small considerations make people feel safe and seen.",
+    "overcome": "Ask 'What would help right now?'; remember and follow up on the little things people tell you; include yourself in your consideration; keep it from sliding into people-pleasing — it's care, not obligation."
+  },
+  "Peaceful › Nurturing › Kind": {
+    "feel": "Warm-hearted and generous — you want to ease someone's load or brighten their day, expecting nothing back.",
+    "body": "Warmth in the chest, a soft smile, gentle eyes, a relaxed body, or a pleasant glow after helping.",
+    "call": "A call to act on the kind impulse — it's rarely one you'll regret.",
+    "overcome": "Do one unannounced kindness today; speak kindly about people who aren't in the room; be as kind in your self-talk as you are to others; let other people be kind to you."
+  },
+  "Peaceful › Nurturing › Friendly": {
+    "feel": "Open and welcoming — glad to see people, easy to approach, and interested in who they are.",
+    "body": "A ready smile, open posture, relaxed shoulders, a warm voice, or easy laughter.",
+    "call": "A call to connect — friendliness turns strangers into community.",
+    "overcome": "Greet people by name; start a conversation with someone new; invite someone along; follow up with an old friend you've been meaning to call."
   }
 }
