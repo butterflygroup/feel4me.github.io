@@ -11,7 +11,7 @@ const VIEW = 640;
 const HUB_R = 52;
 const OUTER_R = 296;
 
-/** Center hub label — three lines */
+/** Center hub label, three lines */
 const HUB_LINES = ["Feel", "4me", ".com"];
 const HUB_FONT_SIZE = 18;
 /** Line spacing (px); tuned so the block sits visually centered in the hub */

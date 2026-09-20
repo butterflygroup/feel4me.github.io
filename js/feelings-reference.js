@@ -1,4 +1,4 @@
-/** Derived from data/emotions.json — keep in sync via flatten at runtime when JSON loads (same as wheel.js normalizeSegment). */
+/** Derived from data/emotions.json. Keep in sync via flatten at runtime when JSON loads (same as wheel.js normalizeSegment). */
 
 /**
  * @typedef {{ label: string; children?: unknown[] }} NormalizedSegment

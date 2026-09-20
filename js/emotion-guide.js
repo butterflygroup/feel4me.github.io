@@ -166,7 +166,7 @@ export function renderEmotionGuide(crumb, isLeaf) {
     const bodyEl = document.getElementById(`emotion-guide-body-${key}`);
     if (titleEl) titleEl.textContent = guideFieldLabel(key, label, crumb);
     const text = (fields[key] ?? "").trim();
-    setText(bodyEl, text || "—");
+    setText(bodyEl, text || "Nothing written yet.");
   }
 
   const emptyNote = document.getElementById("emotion-guide-empty");
