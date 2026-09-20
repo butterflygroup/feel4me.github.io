@@ -15,6 +15,19 @@ export const GUIDE_FIELD_META = /** @type {const} */ ([
   { key: "overcome", label: "Ways to overcome this" },
 ]);
 
+/** Core emotions where the last section is about keeping the feeling, not getting past it. */
+const PLEASANT_ROOTS = new Set(["Joyful", "Powerful", "Peaceful"]);
+const NURTURE_LABEL = "Ways to nurture this";
+
+/**
+ * Section heading for a guide field; `overcome` reads as "nurture" for pleasant feelings.
+ * @param {string} key @param {string} label @param {string} crumb
+ */
+export function guideFieldLabel(key, label, crumb) {
+  if (key !== "overcome") return label;
+  return PLEASANT_ROOTS.has(crumb.split(" › ")[0]) ? NURTURE_LABEL : label;
+}
+
 /** @type {Record<string, EmotionGuideFields>} */
 let bundledGuides = {};
 
@@ -151,7 +164,7 @@ export function renderEmotionGuide(crumb, isLeaf) {
   for (const { key, label } of GUIDE_FIELD_META) {
     const titleEl = document.getElementById(`emotion-guide-title-${key}`);
     const bodyEl = document.getElementById(`emotion-guide-body-${key}`);
-    if (titleEl) titleEl.textContent = label;
+    if (titleEl) titleEl.textContent = guideFieldLabel(key, label, crumb);
     const text = (fields[key] ?? "").trim();
     setText(bodyEl, text || "—");
   }
@@ -224,6 +237,10 @@ export function initEmotionGuideUI() {
     if (crumbEl) crumbEl.textContent = lastGuideCrumb;
     const { fields } = getEffectiveGuideForCrumb(lastGuideCrumb);
     fillFormFields(fields);
+    for (const { key, label } of GUIDE_FIELD_META) {
+      const labelEl = document.querySelector(`label[for="emotion-guide-field-${key}"]`);
+      if (labelEl) labelEl.textContent = guideFieldLabel(key, label, lastGuideCrumb);
+    }
     dialog.showModal();
     updateDialogCharHints();
   });

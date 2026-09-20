@@ -22,6 +22,7 @@ const themeSelect = document.getElementById("theme-select");
 const selectionTextEl = document.getElementById("wheel-selection-text");
 const selectionPanel = document.getElementById("wheel-selection");
 const selectionHeading = document.getElementById("selection-heading");
+const selectionClearBtn = document.getElementById("wheel-selection-clear");
 
 const SELECTION_PLACEHOLDER = "Tap a wedge to select";
 
@@ -41,6 +42,15 @@ let tapStartX = 0;
 let tapStartY = 0;
 /** @type {object | null} */
 let wheelPayload = null;
+/** @type {SVGPathElement | null} */
+let selectionRing = null;
+/** Breadcrumb of the selected wedge; while set, the idle spin stays paused. */
+let selectedCrumb = "";
+let alignHandle = 0;
+/** @type {SVGPathElement | null} */
+let rovingSegment = null;
+/** Keyboard navigation maps, rebuilt on every render. */
+let wheelNav = { rings: [], parentOf: new WeakMap(), firstChildOf: new WeakMap() };
 
 window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", (ev) => {
   prefersReducedMotion = ev.matches;
@@ -102,17 +112,30 @@ function segmentFill(rootIndex, depth, maxDepth) {
   return `hsl(${hue} ${sat}% ${light}%)`;
 }
 
-function labelFontSize(depth, maxDepth) {
-  const outerBias = maxDepth > 0 ? 1 - depth / maxDepth : 1;
-  // Ring 1: wide labels on relatively narrow wedges — smaller type than the old default (~22px).
-  if (depth === 0) {
-    return Math.max(9, Math.round(6 + outerBias * 8));
-  }
-  // Ring 2 (middle) has many narrow wedges — keep type smaller so labels fit along the spoke.
-  if (depth === 1) {
-    return Math.max(8, Math.round(7 + outerBias * 7));
-  }
-  return Math.round(10 + outerBias * 12);
+const LABEL_FONT_MIN = 7;
+const LABEL_FONT_MAX = 16;
+/** Approximate glyph advance (em) for the semi-bold UI font; errs wide so labels stay inside their ring. */
+const LABEL_CHAR_EM = 0.6;
+/** Share of the ring width a label may span */
+const LABEL_RING_FILL = 0.9;
+
+/**
+ * Labels read along the spoke: ring width limits their length, arc length limits their height.
+ * @param {string} text
+ * @param {number} arcLen wedge arc length at the label radius
+ * @param {number} ringWidth radial depth of the wedge
+ */
+function labelFontSize(text, arcLen, ringWidth) {
+  const byArc = arcLen * 0.6;
+  const byLength = (ringWidth * LABEL_RING_FILL) / (Math.max(1, text.length) * LABEL_CHAR_EM);
+  const fit = Math.floor(Math.min(byArc, byLength) * 2) / 2;
+  return Math.max(LABEL_FONT_MIN, Math.min(LABEL_FONT_MAX, fit));
+}
+
+/** Truncate only when a label cannot fit its ring even at the minimum font size. */
+function fitLabelText(text, ringWidth) {
+  const maxChars = Math.floor((ringWidth * LABEL_RING_FILL) / (LABEL_FONT_MIN * LABEL_CHAR_EM));
+  return text.length <= maxChars ? text : `${text.slice(0, Math.max(1, maxChars - 1))}…`;
 }
 
 /** Rotation in degrees so `<text>` reads along the spoke, outward from the center (all rings). */
@@ -120,8 +143,7 @@ function labelRotation(midRad) {
   return (midRad * 180) / Math.PI;
 }
 
-function appendLabel(svgNs, parent, text, midRad, textR, depth, maxDepth) {
-  const fs = labelFontSize(depth, maxDepth);
+function appendLabel(svgNs, parent, text, midRad, textR, fs) {
   const [x, y] = polar(textR, midRad);
   const el = document.createElementNS(svgNs, "text");
   el.setAttribute("x", String(x));
@@ -132,6 +154,7 @@ function appendLabel(svgNs, parent, text, midRad, textR, depth, maxDepth) {
   el.setAttribute("font-size", String(fs));
   el.setAttribute("font-weight", "600");
   el.setAttribute("pointer-events", "none");
+  el.setAttribute("aria-hidden", "true");
   el.setAttribute("transform", `rotate(${labelRotation(midRad)} ${x.toFixed(3)} ${y.toFixed(3)})`);
   el.textContent = text;
   parent.appendChild(el);
@@ -143,21 +166,19 @@ function renderWheel(data) {
   const maxDepth = Math.max(...segments.map(deepestLeafSteps));
   const radii = buildRadii(maxDepth);
 
-  function abbrev(s) {
-    return s.length <= 12 ? s : `${s.slice(0, 11)}…`;
-  }
-
   const svgNs = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(svgNs, "svg");
   svg.setAttribute("viewBox", `${-VIEW / 2} ${-VIEW / 2} ${VIEW} ${VIEW}`);
   svg.setAttribute("width", "640");
   svg.setAttribute("height", "640");
-  svg.setAttribute("role", "presentation");
 
   rotatingGroup = document.createElementNS(svgNs, "g");
   rotatingGroup.classList.add("wheel-rotating");
 
-  function drawBranch(node, start, end, depth, rootIndex, breadcrumb) {
+  wheelNav = { rings: [], parentOf: new WeakMap(), firstChildOf: new WeakMap() };
+  rovingSegment = null;
+
+  function drawBranch(node, start, end, depth, rootIndex, breadcrumb, parentPath) {
     const rInner = radii[depth];
     const rOuter = node.children?.length ? radii[depth + 1] : radii[maxDepth + 1];
     const mid = (start + end) / 2;
@@ -171,27 +192,49 @@ function renderWheel(data) {
     path.classList.add("wheel-segment");
     path.dataset.breadcrumb = crumb;
     path.dataset.label = node.label;
+    path.dataset.midDeg = String((mid * 180) / Math.PI);
     if (!node.children?.length) {
       path.dataset.leaf = "1";
     }
-    path.tabIndex = 0;
+    path.setAttribute("role", "button");
+    path.setAttribute("aria-label", crumb);
+    path.setAttribute("aria-pressed", "false");
+    path.tabIndex = -1;
+    (wheelNav.rings[depth] ??= []).push(path);
+    if (parentPath) {
+      wheelNav.parentOf.set(path, parentPath);
+      if (!wheelNav.firstChildOf.has(parentPath)) wheelNav.firstChildOf.set(parentPath, path);
+    }
     path.addEventListener("click", (ev) => {
       ev.stopPropagation();
       selectSegment(path);
     });
+    path.addEventListener("focus", () => setRovingSegment(path));
     path.addEventListener("keydown", (ev) => {
       if (ev.key === "Enter" || ev.key === " ") {
         ev.preventDefault();
         selectSegment(path);
+        return;
+      }
+      if (ev.key === "Escape" && selectedCrumb) {
+        ev.preventDefault();
+        clearSelection();
+        return;
+      }
+      const target = segmentForArrowKey(path, depth, ev.key);
+      if (target) {
+        ev.preventDefault();
+        setRovingSegment(target);
+        target.focus();
       }
     });
     rotatingGroup.appendChild(path);
 
     const textR = (rInner + rOuter) / 2;
-    const arcSpan = end - start;
-    const labelText =
-      arcSpan * textR > 42 || node.label.length <= 10 ? node.label : abbrev(node.label);
-    appendLabel(svgNs, rotatingGroup, labelText, mid, textR, depth, maxDepth);
+    const ringWidth = rOuter - rInner;
+    const labelText = fitLabelText(node.label, ringWidth);
+    const fs = labelFontSize(labelText, (end - start) * textR, ringWidth);
+    appendLabel(svgNs, rotatingGroup, labelText, mid, textR, fs);
 
     if (!node.children?.length) {
       return;
@@ -200,7 +243,7 @@ function renderWheel(data) {
     node.children.forEach((child, i) => {
       const cs = start + (span * i) / node.children.length;
       const ce = start + (span * (i + 1)) / node.children.length;
-      drawBranch(child, cs, ce, depth + 1, rootIndex, crumb);
+      drawBranch(child, cs, ce, depth + 1, rootIndex, crumb, path);
     });
   }
 
@@ -209,8 +252,17 @@ function renderWheel(data) {
   segments.forEach((seg, rootIndex) => {
     const start = -Math.PI / 2 + (tau * rootIndex) / n;
     const end = -Math.PI / 2 + (tau * (rootIndex + 1)) / n;
-    drawBranch(seg, start, end, 0, rootIndex, "");
+    drawBranch(seg, start, end, 0, rootIndex, "", null);
   });
+
+  if (wheelNav.rings[0]?.[0]) setRovingSegment(wheelNav.rings[0][0]);
+
+  // Drawn last so the selection outline is never covered by neighbouring wedges.
+  selectionRing = document.createElementNS(svgNs, "path");
+  selectionRing.classList.add("wheel-selection-ring");
+  selectionRing.setAttribute("aria-hidden", "true");
+  selectionRing.setAttribute("visibility", "hidden");
+  rotatingGroup.appendChild(selectionRing);
 
   const hub = document.createElementNS(svgNs, "circle");
   hub.setAttribute("cx", "0");
@@ -228,6 +280,7 @@ function renderWheel(data) {
   hubText.setAttribute("font-size", String(HUB_FONT_SIZE));
   hubText.setAttribute("font-weight", "700");
   hubText.setAttribute("pointer-events", "none");
+  hubText.setAttribute("aria-hidden", "true");
   hubText.classList.add("wheel-hub-label");
 
   const hubMid = (HUB_LINES.length - 1) / 2;
@@ -245,7 +298,9 @@ function renderWheel(data) {
   svg.appendChild(hubText);
   mount.appendChild(svg);
   applyRotation();
-  resetSelectionDisplay();
+  const keep = selectedCrumb ? findSegmentByCrumb(selectedCrumb) : null;
+  if (keep) selectSegment(keep, { align: false, scroll: false });
+  else resetSelectionDisplay();
 
   const fsInput = document.getElementById("feelings-search");
   const fsList = document.getElementById("feelings-search-list");
@@ -263,7 +318,23 @@ function applyRotation() {
   rotatingGroup.setAttribute("transform", `rotate(${rotationDeg})`);
 }
 
+/** @returns {SVGPathElement | null} */
+function findSegmentByCrumb(crumb) {
+  for (const p of mount.querySelectorAll(".wheel-segment")) {
+    if (p.dataset.breadcrumb === crumb) return p;
+  }
+  return null;
+}
+
+/** Deselect, hide the panel, and let the wheel drift again. */
+function clearSelection() {
+  clearSegmentSelection();
+  resetSelectionDisplay();
+  scheduleIdle();
+}
+
 function resetSelectionDisplay() {
+  selectedCrumb = "";
   hideEmotionGuidePanel();
   if (selectionTextEl) selectionTextEl.textContent = SELECTION_PLACEHOLDER;
   if (selectionHeading) selectionHeading.hidden = false;
@@ -271,7 +342,41 @@ function resetSelectionDisplay() {
 }
 
 function clearSegmentSelection() {
-  mount.querySelectorAll(".wheel-segment.is-selected").forEach((p) => p.classList.remove("is-selected"));
+  mount.querySelectorAll(".wheel-segment.is-selected").forEach((p) => {
+    p.classList.remove("is-selected");
+    p.setAttribute("aria-pressed", "false");
+  });
+  selectionRing?.setAttribute("visibility", "hidden");
+}
+
+/** Roving tabindex: the wheel is one tab stop; arrow keys move between wedges. */
+function setRovingSegment(path) {
+  if (rovingSegment === path) return;
+  if (rovingSegment) rovingSegment.tabIndex = -1;
+  path.tabIndex = 0;
+  rovingSegment = path;
+}
+
+/** @returns {SVGPathElement | null} */
+function segmentForArrowKey(path, depth, key) {
+  const ring = wheelNav.rings[depth] ?? [];
+  const i = ring.indexOf(path);
+  switch (key) {
+    case "ArrowRight":
+      return ring[(i + 1) % ring.length] ?? null;
+    case "ArrowLeft":
+      return ring[(i - 1 + ring.length) % ring.length] ?? null;
+    case "ArrowDown":
+      return wheelNav.firstChildOf.get(path) ?? null;
+    case "ArrowUp":
+      return wheelNav.parentOf.get(path) ?? null;
+    case "Home":
+      return ring[0] ?? null;
+    case "End":
+      return ring[ring.length - 1] ?? null;
+    default:
+      return null;
+  }
 }
 
 /**
@@ -293,22 +398,26 @@ function getSegmentCandidates(rawQuery) {
 }
 
 /**
- * Exact label matches first, then longest breadcrumb; dedupe by breadcrumb.
+ * Rank by how the feeling's own label matches: exact, then prefix, then substring;
+ * wedges that only match through an ancestor's name come last. Dedupe by breadcrumb.
  * @param {SVGPathElement[]} paths
  * @param {string} q normalized lowercase trimmed query
  */
 function rankAndDedupeCandidates(paths, q) {
-  const exact = paths.filter((p) => (p.dataset.label ?? "").toLowerCase() === q);
-  const rest = paths.filter((p) => (p.dataset.label ?? "").toLowerCase() !== q);
-  function sortPool(arr) {
-    return [...arr].sort((a, b) => {
-      const ca = (a.dataset.breadcrumb ?? "").length;
-      const cb = (b.dataset.breadcrumb ?? "").length;
-      if (ca !== cb) return cb - ca;
-      return (a.dataset.label ?? "").localeCompare(b.dataset.label ?? "", undefined, { sensitivity: "base" });
-    });
+  function tier(p) {
+    const label = (p.dataset.label ?? "").toLowerCase();
+    if (label === q) return 0;
+    if (label.startsWith(q)) return 1;
+    if (label.includes(q)) return 2;
+    return 3;
   }
-  const ordered = [...sortPool(exact), ...sortPool(rest)];
+  const ordered = [...paths].sort((a, b) => {
+    const t = tier(a) - tier(b);
+    if (t !== 0) return t;
+    const byLabel = (a.dataset.label ?? "").localeCompare(b.dataset.label ?? "", undefined, { sensitivity: "base" });
+    if (byLabel !== 0) return byLabel;
+    return (a.dataset.breadcrumb ?? "").localeCompare(b.dataset.breadcrumb ?? "", undefined, { sensitivity: "base" });
+  });
   const seen = new Set();
   /** @type {SVGPathElement[]} */
   const out = [];
@@ -397,14 +506,21 @@ function renderFeelingsSearchOptions(input, listEl, paths) {
   }
 }
 
+function showNoMatch(query) {
+  clearSelection();
+  if (selectionHeading) selectionHeading.hidden = true;
+  if (selectionClearBtn) selectionClearBtn.hidden = true;
+  if (selectionTextEl) selectionTextEl.textContent = `No match for "${query}"`;
+  if (selectionPanel) selectionPanel.hidden = false;
+}
+
 function updateFeelingsSearchSuggestions(input, listEl) {
   const raw = input.value;
   const trimmed = raw.trim();
 
   if (trimmed.length === 0) {
     closeFeelingsSearchList(input, listEl);
-    clearSegmentSelection();
-    resetSelectionDisplay();
+    clearSelection();
     return;
   }
 
@@ -416,10 +532,7 @@ function updateFeelingsSearchSuggestions(input, listEl) {
   const ranked = rankedFeelingsMatches(raw, FEELINGS_SUGGEST_CAP);
   if (ranked.length === 0) {
     closeFeelingsSearchList(input, listEl);
-    clearSegmentSelection();
-    if (selectionHeading) selectionHeading.hidden = true;
-    if (selectionTextEl) selectionTextEl.textContent = `No match for "${trimmed}"`;
-    if (selectionPanel) selectionPanel.hidden = false;
+    showNoMatch(trimmed);
     return;
   }
 
@@ -434,8 +547,7 @@ function updateFeelingsSearchSuggestions(input, listEl) {
 function commitFeelingsSearchSelection(input, listEl) {
   const trimmed = input.value.trim();
   if (trimmed.length === 0) {
-    clearSegmentSelection();
-    resetSelectionDisplay();
+    clearSelection();
     closeFeelingsSearchList(input, listEl);
     return;
   }
@@ -456,10 +568,7 @@ function commitFeelingsSearchSelection(input, listEl) {
 
   const path = findBestSegmentMatch(input.value);
   if (!path) {
-    clearSegmentSelection();
-    if (selectionHeading) selectionHeading.hidden = true;
-    if (selectionTextEl) selectionTextEl.textContent = `No match for "${trimmed}"`;
-    if (selectionPanel) selectionPanel.hidden = false;
+    showNoMatch(trimmed);
     return;
   }
   selectSegment(path);
@@ -513,6 +622,11 @@ function initFeelingsSearchUI() {
       }
       return;
     }
+    if (ev.key === "Enter") {
+      ev.preventDefault();
+      commitFeelingsSearchSelection(input, listEl);
+      return;
+    }
     if (!open) return;
 
     if (ev.key === "ArrowDown") {
@@ -527,17 +641,69 @@ function initFeelingsSearchUI() {
   });
 }
 
-function selectSegment(path) {
-  mount.querySelectorAll(".wheel-segment.is-selected").forEach((p) => p.classList.remove("is-selected"));
+/**
+ * @param {SVGPathElement} path
+ * @param {{ align?: boolean; scroll?: boolean }} [opts]
+ */
+function selectSegment(path, { align = true, scroll = true } = {}) {
+  clearSegmentSelection();
   path.classList.add("is-selected");
+  path.setAttribute("aria-pressed", "true");
+  setRovingSegment(path);
+  if (selectionRing) {
+    selectionRing.setAttribute("d", path.getAttribute("d") ?? "");
+    selectionRing.setAttribute("visibility", "visible");
+  }
   const crumb = path.dataset.breadcrumb ?? path.dataset.label ?? "";
   const isLeaf = path.dataset.leaf === "1";
   if (selectionHeading) selectionHeading.hidden = false;
   if (selectionTextEl) {
-    selectionTextEl.textContent = crumb ? `Selected: ${crumb}` : SELECTION_PLACEHOLDER;
+    selectionTextEl.textContent = crumb || SELECTION_PLACEHOLDER;
   }
+  if (selectionClearBtn) selectionClearBtn.hidden = false;
   if (selectionPanel) selectionPanel.hidden = !crumb;
   renderEmotionGuide(crumb, isLeaf);
+  selectedCrumb = crumb;
+  stopIdleWhileDragging();
+  if (align) alignSegmentToTop(path);
+  if (scroll && selectionPanel && !selectionPanel.hidden) {
+    selectionPanel.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "nearest" });
+  }
+}
+
+function stopAlign() {
+  if (alignHandle) cancelAnimationFrame(alignHandle);
+  alignHandle = 0;
+}
+
+/** Turn the wheel the short way round so the wedge's centre sits at 12 o'clock. */
+function alignSegmentToTop(path) {
+  stopAlign();
+  stopInertia();
+  const midDeg = Number(path.dataset.midDeg) || 0;
+  const from = rotationDeg;
+  const delta = ((((-90 - midDeg - from) % 360) + 540) % 360) - 180;
+  if (prefersReducedMotion || Math.abs(delta) < 0.5) {
+    rotationDeg = from + delta;
+    applyRotation();
+    return;
+  }
+  const duration = 350 + Math.abs(delta) * 2.5;
+  const t0 = performance.now();
+  mount.classList.add("is-idle");
+  const step = (now) => {
+    const t = Math.min(1, (now - t0) / duration);
+    const eased = 1 - (1 - t) ** 3;
+    rotationDeg = from + delta * eased;
+    applyRotation();
+    if (t < 1) {
+      alignHandle = requestAnimationFrame(step);
+    } else {
+      alignHandle = 0;
+      mount.classList.remove("is-idle");
+    }
+  };
+  alignHandle = requestAnimationFrame(step);
 }
 
 function pointerAngle(ev) {
@@ -553,10 +719,10 @@ function stopIdleWhileDragging() {
 }
 
 function scheduleIdle() {
-  if (prefersReducedMotion || dragPointerId !== null || inertiaHandle) return;
+  if (prefersReducedMotion || dragPointerId !== null || inertiaHandle || selectedCrumb) return;
   cancelAnimationFrame(idleFrame);
   const tick = () => {
-    if (dragPointerId !== null || inertiaHandle) return;
+    if (dragPointerId !== null || inertiaHandle || selectedCrumb) return;
     rotationDeg = (rotationDeg + 0.035) % 360;
     applyRotation();
     idleFrame = requestAnimationFrame(tick);
@@ -606,6 +772,7 @@ mount.addEventListener("pointerdown", (ev) => {
   tapStartY = ev.clientY;
   stopIdleWhileDragging();
   stopInertia();
+  stopAlign();
   dragPointerId = ev.pointerId;
   mount.classList.add("is-idle");
   try {
@@ -639,12 +806,16 @@ mount.addEventListener("pointermove", (ev) => {
 function endDrag(ev) {
   if (dragPointerId !== ev.pointerId) return;
 
+  const cancelled = ev.type === "pointercancel";
+  if (cancelled) velocityDegPerMs = 0;
+
   const dx = ev.clientX - tapStartX;
   const dy = ev.clientY - tapStartY;
-  if (dx * dx + dy * dy <= 100) {
+  if (!cancelled && dx * dx + dy * dy <= 100) {
     const hit = document.elementFromPoint(ev.clientX, ev.clientY);
     const seg = hit?.closest?.(".wheel-segment");
     if (seg) selectSegment(seg);
+    else if (hit?.closest?.(".wheel-hub") && selectedCrumb) clearSelection();
   }
 
   dragPointerId = null;
@@ -659,6 +830,29 @@ function endDrag(ev) {
 
 mount.addEventListener("pointerup", endDrag);
 mount.addEventListener("pointercancel", endDrag);
+
+/** Static reference list below the wheel: "Show on the wheel" links and #feeling deep links. */
+function initFeelingsReferenceLinks() {
+  document.addEventListener("click", (ev) => {
+    const link = ev.target instanceof Element ? ev.target.closest("a[data-crumb]") : null;
+    if (!link) return;
+    const path = findSegmentByCrumb(link.dataset.crumb ?? "");
+    if (!path) return;
+    ev.preventDefault();
+    selectSegment(path, { scroll: false });
+    document
+      .querySelector(".wheel-stage")
+      ?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+  });
+
+  const openTargetedFeeling = () => {
+    const id = decodeURIComponent(location.hash.slice(1));
+    const target = id && !id.includes("=") ? document.getElementById(id) : null;
+    if (target instanceof HTMLDetailsElement) target.open = true;
+  };
+  window.addEventListener("hashchange", openTargetedFeeling);
+  openTargetedFeeling();
+}
 
 async function init() {
   applyPaletteFromURL();
@@ -702,6 +896,14 @@ async function init() {
 
   initFeelingsSearchUI();
   initEmotionGuideUI();
+
+  initFeelingsReferenceLinks();
+
+  selectionClearBtn?.addEventListener("click", () => {
+    const fsInput = document.getElementById("feelings-search");
+    if (fsInput) fsInput.value = "";
+    clearSelection();
+  });
 
   themeSelect?.addEventListener("change", () => {
     clearPresetWedgeOverrides();
