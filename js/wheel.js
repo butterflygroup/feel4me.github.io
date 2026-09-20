@@ -921,6 +921,14 @@ async function init() {
   if (!prefersReducedMotion) scheduleIdle();
 }
 
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register(new URL("../sw.js", import.meta.url)).catch(() => {
+      /* offline support is optional */
+    });
+  });
+}
+
 init().catch((err) => {
   console.error(err);
   mount.textContent = "Could not load the feelings wheel.";

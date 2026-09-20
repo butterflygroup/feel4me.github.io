@@ -1,0 +1,16 @@
+{
+  "name": "Feel4me Feelings Wheel",
+  "short_name": "Feel4me",
+  "description": "An interactive feelings wheel: find the word for what you feel and read a short guide for each of 72 feelings.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f1419",
+  "theme_color": "#121922",
+  "categories": ["health", "lifestyle", "education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
