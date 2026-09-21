@@ -59,8 +59,9 @@
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="hero">
+      <p class="hero__brand">feel<span>4</span>me</p>
       <h1 class="hero__title">The Feelings Wheel</h1>
-      <p class="hero__tagline">Find the word for what you feel. Tap the wheel or search 72 feelings. Each one has a short guide.</p>
+      <p class="hero__tagline">Find the word for what you feel. Tap Start to be guided, or explore the wheel and search 72 feelings yourself.</p>
 
       <div class="hero__toolbar">
         <div class="toolbar-cluster">
@@ -99,18 +100,29 @@
         ></div>
         <p id="wheel-help" class="sr-only">
           Left and right arrows move around a ring, down arrow moves out to more specific feelings, up arrow moves back in.
-          Press Enter or Space to select a feeling.
+          Press Enter or Space to select a feeling. The Start button in the center asks three short questions instead.
         </p>
+        <p id="wheel-start-hint" class="wheel-hint">New here? Tap <strong>Start</strong> in the center to be guided.</p>
         <div
           id="wheel-selection"
           class="selection-display"
           hidden
-          aria-live="polite"
-          aria-atomic="true"
-          aria-labelledby="selection-heading"
+          role="region"
+          aria-label="Your feeling"
         >
+          <div id="wheel-flow-bar" class="flow-bar" hidden>
+            <button type="button" id="wheel-flow-back" class="flow-bar__back">&larr; Back</button>
+            <ol class="flow-steps" aria-label="Steps">
+              <li id="wheel-flow-step-1" class="flow-steps__item">1 Core</li>
+              <li id="wheel-flow-step-2" class="flow-steps__item">2 Closer</li>
+              <li id="wheel-flow-step-3" class="flow-steps__item">3 Exact</li>
+            </ol>
+          </div>
           <h3 id="selection-heading" class="selection-display__title">Selected</h3>
-          <p id="wheel-selection-text" class="selection-display__body">Tap a wedge to select</p>
+          <p id="wheel-selection-text" class="selection-display__body" aria-live="polite">Tap a wedge to select</p>
+          <p id="wheel-selection-summary" class="selection-display__summary" hidden></p>
+          <p id="wheel-flow-question" class="flow-question" hidden></p>
+          <div id="wheel-flow-options" class="flow-options" hidden></div>
           <button type="button" id="wheel-selection-clear" class="selection-display__clear">Clear selection</button>
           <div id="emotion-guide" class="emotion-guide" hidden>
             <p id="emotion-guide-empty" class="emotion-guide__empty" hidden>
@@ -222,6 +234,7 @@
           <h3>Sad</h3>
           <div class="ref-group">
             <h4>Hurt</h4>
+            <p class="ref-group__summary">Something someone said or did landed painfully, and it still stings.</p>
             <details class="ref-feeling" id="sad-hurt-embarrassed">
               <summary>
                 <span class="ref-feeling__name">Embarrassed</span>
@@ -276,6 +289,7 @@
           </div>
           <div class="ref-group">
             <h4>Depressed</h4>
+            <p class="ref-group__summary">A heavy, low feeling where energy and interest have drained away.</p>
             <details class="ref-feeling" id="sad-depressed-empty">
               <summary>
                 <span class="ref-feeling__name">Empty</span>
@@ -330,6 +344,7 @@
           </div>
           <div class="ref-group">
             <h4>Guilty</h4>
+            <p class="ref-group__summary">You believe you did something wrong, or failed to do something right.</p>
             <details class="ref-feeling" id="sad-guilty-remorseful">
               <summary>
                 <span class="ref-feeling__name">Remorseful</span>
@@ -384,6 +399,7 @@
           </div>
           <div class="ref-group">
             <h4>Lonely</h4>
+            <p class="ref-group__summary">You feel cut off from people, even if others are around.</p>
             <details class="ref-feeling" id="sad-lonely-abandoned">
               <summary>
                 <span class="ref-feeling__name">Abandoned</span>
@@ -441,6 +457,7 @@
           <h3>Mad</h3>
           <div class="ref-group">
             <h4>Hateful</h4>
+            <p class="ref-group__summary">A cold, hard anger that looks down on a person or an idea.</p>
             <details class="ref-feeling" id="mad-hateful-critical">
               <summary>
                 <span class="ref-feeling__name">Critical</span>
@@ -495,6 +512,7 @@
           </div>
           <div class="ref-group">
             <h4>Aggressive</h4>
+            <p class="ref-group__summary">A hot, outward anger that wants to push back or strike.</p>
             <details class="ref-feeling" id="mad-aggressive-provoked">
               <summary>
                 <span class="ref-feeling__name">Provoked</span>
@@ -549,6 +567,7 @@
           </div>
           <div class="ref-group">
             <h4>Antagonistic</h4>
+            <p class="ref-group__summary">A combative anger that wants to oppose, argue, or prove someone wrong.</p>
             <details class="ref-feeling" id="mad-antagonistic-hateful">
               <summary>
                 <span class="ref-feeling__name">Hateful</span>
@@ -603,6 +622,7 @@
           </div>
           <div class="ref-group">
             <h4>Withdrawn</h4>
+            <p class="ref-group__summary">A quiet anger that pulls away and shuts people out instead of speaking up.</p>
             <details class="ref-feeling" id="mad-withdrawn-resistant">
               <summary>
                 <span class="ref-feeling__name">Resistant</span>
@@ -660,6 +680,7 @@
           <h3>Scared</h3>
           <div class="ref-group">
             <h4>Rejected</h4>
+            <p class="ref-group__summary">A fear that you are not wanted, or the pain of being pushed away.</p>
             <details class="ref-feeling" id="scared-rejected-betrayed">
               <summary>
                 <span class="ref-feeling__name">Betrayed</span>
@@ -714,6 +735,7 @@
           </div>
           <div class="ref-group">
             <h4>Weak</h4>
+            <p class="ref-group__summary">A fear that you are not strong enough, or not enough at all.</p>
             <details class="ref-feeling" id="scared-weak-worthless">
               <summary>
                 <span class="ref-feeling__name">Worthless</span>
@@ -768,6 +790,7 @@
           </div>
           <div class="ref-group">
             <h4>Threatened</h4>
+            <p class="ref-group__summary">A sense that something could hurt you, and you need to stay on guard.</p>
             <details class="ref-feeling" id="scared-threatened-exposed">
               <summary>
                 <span class="ref-feeling__name">Exposed</span>
@@ -822,6 +845,7 @@
           </div>
           <div class="ref-group">
             <h4>Unsure</h4>
+            <p class="ref-group__summary">You don&#x27;t know where you stand or what to do next, and it unsettles you.</p>
             <details class="ref-feeling" id="scared-unsure-dismissive">
               <summary>
                 <span class="ref-feeling__name">Dismissive</span>
@@ -879,6 +903,7 @@
           <h3>Joyful</h3>
           <div class="ref-group">
             <h4>Excited</h4>
+            <p class="ref-group__summary">High, bright energy about something happening now or coming soon.</p>
             <details class="ref-feeling" id="joyful-excited-sensuous">
               <summary>
                 <span class="ref-feeling__name">Sensuous</span>
@@ -933,6 +958,7 @@
           </div>
           <div class="ref-group">
             <h4>Creative</h4>
+            <p class="ref-group__summary">A lively urge to make, imagine, and play.</p>
             <details class="ref-feeling" id="joyful-creative-inspired">
               <summary>
                 <span class="ref-feeling__name">Inspired</span>
@@ -987,6 +1013,7 @@
           </div>
           <div class="ref-group">
             <h4>Sensitive</h4>
+            <p class="ref-group__summary">An open, tuned-in gladness that notices small good things.</p>
             <details class="ref-feeling" id="joyful-sensitive-aware">
               <summary>
                 <span class="ref-feeling__name">Aware</span>
@@ -1041,6 +1068,7 @@
           </div>
           <div class="ref-group">
             <h4>Intimate</h4>
+            <p class="ref-group__summary">The happiness of being close to someone and welcome as you are.</p>
             <details class="ref-feeling" id="joyful-intimate-accepted">
               <summary>
                 <span class="ref-feeling__name">Accepted</span>
@@ -1098,6 +1126,7 @@
           <h3>Powerful</h3>
           <div class="ref-group">
             <h4>Faithful</h4>
+            <p class="ref-group__summary">A steady strength that comes from trust, loyalty, and conviction.</p>
             <details class="ref-feeling" id="powerful-faithful-confident">
               <summary>
                 <span class="ref-feeling__name">Confident</span>
@@ -1152,6 +1181,7 @@
           </div>
           <div class="ref-group">
             <h4>Hopeful</h4>
+            <p class="ref-group__summary">A forward-looking strength. You expect good things and feel ready for them.</p>
             <details class="ref-feeling" id="powerful-hopeful-expectant">
               <summary>
                 <span class="ref-feeling__name">Expectant</span>
@@ -1206,6 +1236,7 @@
           </div>
           <div class="ref-group">
             <h4>Proud</h4>
+            <p class="ref-group__summary">Satisfaction in who you are and what you have done.</p>
             <details class="ref-feeling" id="powerful-proud-trusting">
               <summary>
                 <span class="ref-feeling__name">Trusting</span>
@@ -1260,6 +1291,7 @@
           </div>
           <div class="ref-group">
             <h4>Respected</h4>
+            <p class="ref-group__summary">Knowing that other people value you and what you bring.</p>
             <details class="ref-feeling" id="powerful-respected-valued">
               <summary>
                 <span class="ref-feeling__name">Valued</span>
@@ -1317,6 +1349,7 @@
           <h3>Peaceful</h3>
           <div class="ref-group">
             <h4>Thoughtful</h4>
+            <p class="ref-group__summary">A calm, inward state where you can reflect and see things clearly.</p>
             <details class="ref-feeling" id="peaceful-thoughtful-reflective">
               <summary>
                 <span class="ref-feeling__name">Reflective</span>
@@ -1371,6 +1404,7 @@
           </div>
           <div class="ref-group">
             <h4>Intimate</h4>
+            <p class="ref-group__summary">A settled closeness with someone you love.</p>
             <details class="ref-feeling" id="peaceful-intimate-thankful">
               <summary>
                 <span class="ref-feeling__name">Thankful</span>
@@ -1425,6 +1459,7 @@
           </div>
           <div class="ref-group">
             <h4>Trusting</h4>
+            <p class="ref-group__summary">Feeling safe enough to relax your guard and rely on others.</p>
             <details class="ref-feeling" id="peaceful-trusting-sensitive">
               <summary>
                 <span class="ref-feeling__name">Sensitive</span>
@@ -1479,6 +1514,7 @@
           </div>
           <div class="ref-group">
             <h4>Nurturing</h4>
+            <p class="ref-group__summary">A gentle wish to care for other people and help them feel at home.</p>
             <details class="ref-feeling" id="peaceful-nurturing-considerate">
               <summary>
                 <span class="ref-feeling__name">Considerate</span>

@@ -41,6 +41,12 @@ export function setBundledGuides(map) {
   bundledGuides = map && typeof map === "object" ? map : {};
 }
 
+/** A single field of a bundled guide ("" when missing); used for guided-flow option descriptions. */
+export function getBundledGuideField(crumb, key) {
+  const v = bundledGuides[crumb]?.[key];
+  return typeof v === "string" ? v.trim() : "";
+}
+
 function emptyFields() {
   return /** @type {EmotionGuideFields} */ ({
     feel: "",

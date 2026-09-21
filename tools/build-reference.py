@@ -3,7 +3,7 @@
 
 The wheel is drawn by JavaScript, so without this section crawlers (and visitors
 with JS disabled) would see none of the guide text. Run this after editing
-data/emotions.json or data/emotion-guides.json:
+data/emotions.json, data/emotion-guides.json or data/emotion-summaries.json:
 
     python3 tools/build-reference.py          # rewrite index.html in place
     python3 tools/build-reference.py --check  # exit 1 if index.html is stale
@@ -81,7 +81,7 @@ def render_feeling(crumb, guide):
     return out
 
 
-def render_reference(segments, guides):
+def render_reference(segments, guides, summaries):
     out = []
     for root in segments:
         root_label = label_of(root)
@@ -91,6 +91,9 @@ def render_reference(segments, guides):
             mid_label = label_of(mid)
             out.append('  <div class="ref-group">')
             out.append(f"    <h4>{esc(mid_label)}</h4>")
+            mid_summary = summaries.get(SEP.join([root_label, mid_label]), "").strip()
+            if mid_summary:
+                out.append(f'    <p class="ref-group__summary">{esc(mid_summary)}</p>')
             for leaf in children_of(mid):
                 crumb = SEP.join([root_label, mid_label, label_of(leaf)])
                 out.extend("    " + line for line in render_feeling(crumb, guides.get(crumb)))
@@ -102,13 +105,15 @@ def render_reference(segments, guides):
 def main():
     segments = json.loads((ROOT / "data/emotions.json").read_text(encoding="utf-8"))["segments"]
     guides = json.loads((ROOT / "data/emotion-guides.json").read_text(encoding="utf-8"))
+    summaries_path = ROOT / "data/emotion-summaries.json"
+    summaries = json.loads(summaries_path.read_text(encoding="utf-8")) if summaries_path.exists() else {}
 
     page = INDEX.read_text(encoding="utf-8")
     if page.count(START) != 1 or page.count(END) != 1:
         sys.exit("index.html is missing the feelings-reference start/end markers")
     head, rest = page.split(START)
     _, tail = rest.split(END)
-    built = f"{head}{START}\n{render_reference(segments, guides)}\n{INDENT}{END}{tail}"
+    built = f"{head}{START}\n{render_reference(segments, guides, summaries)}\n{INDENT}{END}{tail}"
 
     if "--check" in sys.argv[1:]:
         if built != page:

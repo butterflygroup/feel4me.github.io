@@ -1,21 +1,25 @@
 import { applyPaletteFromURL, clearPresetWedgeOverrides, initColorsPanel } from "./colors-panel.js";
 import {
+  getBundledGuideField,
   hideEmotionGuidePanel,
   initEmotionGuideUI,
   renderEmotionGuide,
   setBundledGuides,
 } from "./emotion-guide.js";
 import { flattenFeelingsForReference, normalizeSegment } from "./feelings-reference.js";
+import { FIRST_QUESTION, renderFlowPanel } from "./guided-flow.js";
 
 const VIEW = 640;
 const HUB_R = 52;
 const OUTER_R = 296;
 
-/** Center hub label, three lines */
-const HUB_LINES = ["Feel", "4me", ".com"];
-const HUB_FONT_SIZE = 18;
-/** Line spacing (px); tuned so the block sits visually centered in the hub */
-const HUB_LINE_GAP = Math.round(HUB_FONT_SIZE * 1.14);
+/** Center hub: a button that starts the guided flow, then steps back through it. */
+const HUB_START_LABEL = "Start";
+const HUB_CLOSE_LABEL = "Close";
+const HUB_BACK_HINT = "← back";
+const HUB_FONT_SIZE = 20;
+const CRUMB_SEP = " › ";
+const HINT_SEEN_KEY = "feel4me:start-hint-seen";
 
 const mount = document.getElementById("wheel-mount");
 const themeSelect = document.getElementById("theme-select");
@@ -49,6 +53,14 @@ let selectedCrumb = "";
 let alignHandle = 0;
 /** @type {SVGPathElement | null} */
 let rovingSegment = null;
+/** Guided flow opened from the hub; with no selection it shows the first question. */
+let flowStarted = false;
+/** @type {Record<string, string>} one-line descriptions for core and middle-ring feelings */
+let emotionSummaries = {};
+/** @type {{ label: string; children: any[] }[]} */
+let normalizedSegments = [];
+/** @type {SVGGElement | null} */
+let hubGroup = null;
 /** Keyboard navigation maps, rebuilt on every render. */
 let wheelNav = { rings: [], parentOf: new WeakMap(), firstChildOf: new WeakMap() };
 
@@ -143,7 +155,7 @@ function labelRotation(midRad) {
   return (midRad * 180) / Math.PI;
 }
 
-function appendLabel(svgNs, parent, text, midRad, textR, fs) {
+function appendLabel(svgNs, parent, text, midRad, textR, fs, crumb) {
   const [x, y] = polar(textR, midRad);
   const el = document.createElementNS(svgNs, "text");
   el.setAttribute("x", String(x));
@@ -156,6 +168,8 @@ function appendLabel(svgNs, parent, text, midRad, textR, fs) {
   el.setAttribute("pointer-events", "none");
   el.setAttribute("aria-hidden", "true");
   el.setAttribute("transform", `rotate(${labelRotation(midRad)} ${x.toFixed(3)} ${y.toFixed(3)})`);
+  el.classList.add("wheel-label");
+  el.dataset.breadcrumb = crumb;
   el.textContent = text;
   parent.appendChild(el);
 }
@@ -234,7 +248,7 @@ function renderWheel(data) {
     const ringWidth = rOuter - rInner;
     const labelText = fitLabelText(node.label, ringWidth);
     const fs = labelFontSize(labelText, (end - start) * textR, ringWidth);
-    appendLabel(svgNs, rotatingGroup, labelText, mid, textR, fs);
+    appendLabel(svgNs, rotatingGroup, labelText, mid, textR, fs, crumb);
 
     if (!node.children?.length) {
       return;
@@ -264,38 +278,38 @@ function renderWheel(data) {
   selectionRing.setAttribute("visibility", "hidden");
   rotatingGroup.appendChild(selectionRing);
 
+  hubGroup = document.createElementNS(svgNs, "g");
+  hubGroup.classList.add("wheel-hub");
+  hubGroup.setAttribute("role", "button");
+  hubGroup.tabIndex = 0;
+  hubGroup.addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter" || ev.key === " ") {
+      ev.preventDefault();
+      activateHub();
+    }
+  });
+
   const hub = document.createElementNS(svgNs, "circle");
   hub.setAttribute("cx", "0");
   hub.setAttribute("cy", "0");
   hub.setAttribute("r", String(HUB_R - 4));
-  hub.setAttribute("fill", "var(--center-fill)");
   hub.setAttribute("stroke", "var(--segment-stroke)");
-  hub.classList.add("wheel-hub");
+  hub.classList.add("wheel-hub__disc");
+  hubGroup.appendChild(hub);
 
-  const hubText = document.createElementNS(svgNs, "text");
-  hubText.setAttribute("x", "0");
-  hubText.setAttribute("y", "0");
-  hubText.setAttribute("text-anchor", "middle");
-  hubText.setAttribute("fill", "var(--center-text)");
-  hubText.setAttribute("font-size", String(HUB_FONT_SIZE));
-  hubText.setAttribute("font-weight", "700");
-  hubText.setAttribute("pointer-events", "none");
-  hubText.setAttribute("aria-hidden", "true");
-  hubText.classList.add("wheel-hub-label");
-
-  const hubMid = (HUB_LINES.length - 1) / 2;
-  HUB_LINES.forEach((line, i) => {
-    const tsp = document.createElementNS(svgNs, "tspan");
-    tsp.setAttribute("x", "0");
-    tsp.setAttribute("y", String((i - hubMid) * HUB_LINE_GAP));
-    tsp.setAttribute("dominant-baseline", "middle");
-    tsp.textContent = line;
-    hubText.appendChild(tsp);
-  });
+  for (const cls of ["wheel-hub__label", "wheel-hub__hint"]) {
+    const t = document.createElementNS(svgNs, "text");
+    t.setAttribute("x", "0");
+    t.setAttribute("text-anchor", "middle");
+    t.setAttribute("dominant-baseline", "middle");
+    t.setAttribute("pointer-events", "none");
+    t.setAttribute("aria-hidden", "true");
+    t.classList.add(cls);
+    hubGroup.appendChild(t);
+  }
 
   svg.appendChild(rotatingGroup);
-  svg.appendChild(hub);
-  svg.appendChild(hubText);
+  svg.appendChild(hubGroup);
   mount.appendChild(svg);
   applyRotation();
   const keep = selectedCrumb ? findSegmentByCrumb(selectedCrumb) : null;
@@ -326,8 +340,9 @@ function findSegmentByCrumb(crumb) {
   return null;
 }
 
-/** Deselect, hide the panel, and let the wheel drift again. */
+/** Deselect, leave the guided flow, hide the panel, and let the wheel drift again. */
 function clearSelection() {
+  flowStarted = false;
   clearSegmentSelection();
   resetSelectionDisplay();
   scheduleIdle();
@@ -339,6 +354,133 @@ function resetSelectionDisplay() {
   if (selectionTextEl) selectionTextEl.textContent = SELECTION_PLACEHOLDER;
   if (selectionHeading) selectionHeading.hidden = false;
   if (selectionPanel) selectionPanel.hidden = true;
+  updateFlowUI();
+}
+
+/** Children of a breadcrumb in the emotion tree ("" = the six core emotions). */
+function childNodesOfCrumb(crumb) {
+  let nodes = normalizedSegments;
+  if (!crumb) return nodes;
+  for (const label of crumb.split(CRUMB_SEP)) {
+    const next = nodes.find((n) => n.label === label);
+    if (!next) return [];
+    nodes = next.children ?? [];
+  }
+  return nodes;
+}
+
+/** Fade every wedge that is not on the selected branch (ancestors, the wedge itself, descendants stay lit). */
+function applyBranchDim(crumb) {
+  mount.querySelectorAll(".wheel-segment, .wheel-label").forEach((el) => {
+    const c = el.dataset.breadcrumb ?? "";
+    const onBranch =
+      !crumb || c === crumb || c.startsWith(crumb + CRUMB_SEP) || crumb.startsWith(c + CRUMB_SEP);
+    el.classList.toggle("is-dim", !onBranch);
+  });
+}
+
+function updateHub() {
+  if (!hubGroup) return;
+  const disc = hubGroup.querySelector(".wheel-hub__disc");
+  const label = hubGroup.querySelector(".wheel-hub__label");
+  const hint = hubGroup.querySelector(".wheel-hub__hint");
+  if (!disc || !label || !hint) return;
+
+  const name = selectedCrumb ? selectedCrumb.split(CRUMB_SEP).pop() : "";
+  const rootSeg = selectedCrumb ? findSegmentByCrumb(selectedCrumb.split(CRUMB_SEP)[0]) : null;
+  disc.setAttribute("fill", rootSeg?.getAttribute("fill") ?? "var(--center-fill)");
+  hubGroup.classList.toggle("has-selection", Boolean(name));
+
+  if (name) {
+    label.textContent = name;
+    label.setAttribute("font-size", String(name.length > 11 ? 11 : name.length > 8 ? 13 : 16));
+    label.setAttribute("y", "-7");
+    hint.textContent = HUB_BACK_HINT;
+    hint.setAttribute("y", "13");
+    hubGroup.setAttribute("aria-label", `Back one step from ${name}`);
+  } else {
+    label.textContent = flowStarted ? HUB_CLOSE_LABEL : HUB_START_LABEL;
+    label.setAttribute("font-size", String(HUB_FONT_SIZE));
+    label.setAttribute("y", "1");
+    hint.textContent = "";
+    hubGroup.setAttribute("aria-label", flowStarted ? "Close the guided questions" : "Start: help me find my feeling");
+  }
+}
+
+/** Sync hub, branch dimming and the question panel with the current selection / flow state. */
+function updateFlowUI() {
+  updateHub();
+  applyBranchDim(selectedCrumb);
+
+  const visible = Boolean(selectedCrumb) || flowStarted;
+  const depth = selectedCrumb ? selectedCrumb.split(CRUMB_SEP).length : 0;
+  const rootFill = (crumb) => findSegmentByCrumb(crumb.split(CRUMB_SEP)[0])?.getAttribute("fill") ?? "";
+  const options = childNodesOfCrumb(selectedCrumb).map((node) => {
+    const crumb = selectedCrumb ? `${selectedCrumb}${CRUMB_SEP}${node.label}` : node.label;
+    const desc = node.children?.length ? (emotionSummaries[crumb] ?? "") : getBundledGuideField(crumb, "feel");
+    return { label: node.label, crumb, desc, color: rootFill(crumb) };
+  });
+
+  if (visible && !selectedCrumb) {
+    if (selectionHeading) selectionHeading.hidden = true;
+    if (selectionTextEl) selectionTextEl.textContent = FIRST_QUESTION;
+    if (selectionClearBtn) selectionClearBtn.hidden = true;
+    if (selectionPanel) selectionPanel.hidden = false;
+  }
+
+  renderFlowPanel({
+    visible,
+    depth,
+    summary: selectedCrumb ? (emotionSummaries[selectedCrumb] ?? "") : "",
+    options: visible ? options : [],
+    onPick: (crumb) => {
+      const seg = findSegmentByCrumb(crumb);
+      if (seg) selectSegment(seg);
+    },
+  });
+}
+
+function dismissStartHint() {
+  const hint = document.getElementById("wheel-start-hint");
+  if (hint) hint.hidden = true;
+  try {
+    localStorage.setItem(HINT_SEEN_KEY, "1");
+  } catch {
+    /* storage is optional */
+  }
+}
+
+/** Open the guided questions at step one. */
+function startFlow() {
+  flowStarted = true;
+  dismissStartHint();
+  stopIdleWhileDragging();
+  updateFlowUI();
+  selectionPanel?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "nearest" });
+}
+
+/** One step back: leaf to middle ring, middle ring to core, core to the first question, then close. */
+function goBack() {
+  if (selectedCrumb) {
+    const parts = selectedCrumb.split(CRUMB_SEP);
+    parts.pop();
+    const parent = parts.length ? findSegmentByCrumb(parts.join(CRUMB_SEP)) : null;
+    if (parent) {
+      selectSegment(parent);
+      return;
+    }
+    flowStarted = true;
+    clearSegmentSelection();
+    resetSelectionDisplay();
+    return;
+  }
+  clearSelection();
+}
+
+/** The hub starts the flow when idle, and steps back once something is chosen. */
+function activateHub() {
+  if (!selectedCrumb && !flowStarted) startFlow();
+  else goBack();
 }
 
 function clearSegmentSelection() {
@@ -664,6 +806,8 @@ function selectSegment(path, { align = true, scroll = true } = {}) {
   if (selectionPanel) selectionPanel.hidden = !crumb;
   renderEmotionGuide(crumb, isLeaf);
   selectedCrumb = crumb;
+  dismissStartHint();
+  updateFlowUI();
   stopIdleWhileDragging();
   if (align) alignSegmentToTop(path);
   if (scroll && selectionPanel && !selectionPanel.hidden) {
@@ -719,10 +863,10 @@ function stopIdleWhileDragging() {
 }
 
 function scheduleIdle() {
-  if (prefersReducedMotion || dragPointerId !== null || inertiaHandle || selectedCrumb) return;
+  if (prefersReducedMotion || dragPointerId !== null || inertiaHandle || selectedCrumb || flowStarted) return;
   cancelAnimationFrame(idleFrame);
   const tick = () => {
-    if (dragPointerId !== null || inertiaHandle || selectedCrumb) return;
+    if (dragPointerId !== null || inertiaHandle || selectedCrumb || flowStarted) return;
     rotationDeg = (rotationDeg + 0.035) % 360;
     applyRotation();
     idleFrame = requestAnimationFrame(tick);
@@ -815,7 +959,7 @@ function endDrag(ev) {
     const hit = document.elementFromPoint(ev.clientX, ev.clientY);
     const seg = hit?.closest?.(".wheel-segment");
     if (seg) selectSegment(seg);
-    else if (hit?.closest?.(".wheel-hub") && selectedCrumb) clearSelection();
+    else if (hit?.closest?.(".wheel-hub")) activateHub();
   }
 
   dragPointerId = null;
@@ -859,10 +1003,21 @@ async function init() {
 
   const emotionsUrl = new URL("../data/emotions.json", import.meta.url);
   const guidesUrl = new URL("../data/emotion-guides.json", import.meta.url);
-  const [emotionsRes, guidesRes] = await Promise.all([fetch(emotionsUrl), fetch(guidesUrl)]);
+  const summariesUrl = new URL("../data/emotion-summaries.json", import.meta.url);
+  const [emotionsRes, guidesRes, summariesRes] = await Promise.all([
+    fetch(emotionsUrl),
+    fetch(guidesUrl),
+    fetch(summariesUrl).catch(() => null),
+  ]);
   if (!emotionsRes.ok) throw new Error(`Failed to load emotions (${emotionsRes.status})`);
   const data = await emotionsRes.json();
   wheelPayload = data;
+  normalizedSegments = data.segments.map(normalizeSegment);
+  try {
+    emotionSummaries = summariesRes?.ok ? await summariesRes.json() : {};
+  } catch {
+    emotionSummaries = {};
+  }
 
   if (guidesRes.ok) {
     try {
@@ -898,6 +1053,13 @@ async function init() {
   initEmotionGuideUI();
 
   initFeelingsReferenceLinks();
+
+  document.getElementById("wheel-flow-back")?.addEventListener("click", goBack);
+  try {
+    if (localStorage.getItem(HINT_SEEN_KEY)) dismissStartHint();
+  } catch {
+    /* storage is optional */
+  }
 
   selectionClearBtn?.addEventListener("click", () => {
     const fsInput = document.getElementById("feelings-search");
