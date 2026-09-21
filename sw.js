@@ -53,7 +53,8 @@ async function networkFirst(request) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), NETWORK_TIMEOUT_MS);
   try {
-    const response = await fetch(request, { signal: controller.signal });
+    // "no-cache" revalidates with the server, so a deploy never mixes old HTML with new CSS or JS.
+    const response = await fetch(request, { signal: controller.signal, cache: "no-cache" });
     if (response.ok) {
       const key = request.mode === "navigate" ? "./" : request;
       cache.put(key, response.clone());

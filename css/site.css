@@ -76,6 +76,8 @@ body {
 }
 
 .hero {
+  /* Wheel width: as wide as the screen allows, but never taller than what is left under the header. */
+  --stage-w: max(280px, min(92vw, calc(100svh - 12rem), 640px));
   background: linear-gradient(180deg, var(--hero-bg), var(--page-bg));
   padding: 1.25rem 1rem 2rem;
   text-align: center;
@@ -117,7 +119,7 @@ body {
   gap: 0.75rem 1rem;
   margin: 0 auto 1rem;
   width: 100%;
-  max-width: min(92vw, 520px);
+  max-width: var(--stage-w);
   text-align: initial;
 }
 
@@ -257,9 +259,10 @@ body {
 }
 
 .wheel-stage {
+  --stage-pad: 1rem;
   margin: 0 auto;
-  max-width: min(92vw, 520px);
-  padding: 1rem;
+  max-width: var(--stage-w);
+  padding: var(--stage-pad);
   border-radius: 20px;
   background: var(--wheel-stage-bg);
   box-shadow: 0 24px 48px var(--wheel-shadow);
@@ -267,7 +270,9 @@ body {
 
 .wheel-mount {
   width: 100%;
+  margin-inline: auto;
   aspect-ratio: 1;
+  transition: width 350ms ease;
   cursor: grab;
   touch-action: pan-y pinch-zoom;
   border-radius: 50%;
@@ -356,7 +361,8 @@ body {
   font: inherit;
   font-size: 0.8rem;
   font-weight: 600;
-  padding: 0.3rem 0.7rem;
+  min-height: 36px;
+  padding: 0.3rem 0.8rem;
   cursor: pointer;
   color: var(--control-fg);
   background: var(--control-bg);
@@ -393,6 +399,11 @@ body {
   color: var(--page-bg);
   background: var(--page-fg);
   border-color: var(--page-fg);
+}
+
+/* The step chips already say where you are, so the "Selected" eyebrow would only cost height. */
+.flow-bar:not([hidden]) ~ .selection-display__title {
+  display: none;
 }
 
 .flow-question {
@@ -988,22 +999,63 @@ body {
 }
 
 /* Wide screens: once the panel opens, keep the wheel beside it instead of above it. */
-@media (min-width: 960px) {
+/*
+ * Layout modes once the panel is open:
+ *  - side by side (wide screens, or any landscape screen wide enough): wheel sticks beside the panel
+ *  - stacked (phones, portrait tablets): a smaller wheel pins to the top while the panel scrolls under it
+ */
+.wheel-stage:has(> .selection-display:not([hidden])) .wheel-pin {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  margin: calc(-1 * var(--stage-pad)) calc(-1 * var(--stage-pad)) 0;
+  padding: 0.5rem var(--stage-pad);
+  background: var(--page-bg);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 10px 14px -10px rgba(0, 0, 0, 0.7);
+}
+
+.wheel-stage:has(> .selection-display:not([hidden])) .wheel-mount {
+  width: min(100%, max(190px, 36svh));
+}
+
+.wheel-stage:has(> .selection-display:not([hidden])) .selection-display {
+  margin-top: 0.75rem;
+}
+
+/* Very short phones: a smaller pinned wheel so the first option still fits under it. */
+@media (max-height: 640px) {
+  .wheel-stage:has(> .selection-display:not([hidden])) .wheel-mount {
+    width: min(100%, max(160px, 29svh));
+  }
+}
+
+@media (min-width: 960px), (min-width: 640px) and (orientation: landscape) {
   .wheel-stage:has(> .selection-display:not([hidden])) {
     display: grid;
-    grid-template-columns: minmax(0, 488px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, var(--wheel-col)) minmax(0, 1fr);
     grid-template-areas:
       "wheel panel"
       "hint panel";
     align-items: start;
     column-gap: 1.25rem;
-    max-width: min(94vw, 1000px);
+    max-width: min(96vw, 1120px);
+    --wheel-col: min(560px, 48vw, calc(100svh - 2rem));
+  }
+
+  .wheel-stage:has(> .selection-display:not([hidden])) .wheel-pin {
+    grid-area: wheel;
+    top: 1rem;
+    z-index: auto;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .wheel-stage:has(> .selection-display:not([hidden])) .wheel-mount {
-    grid-area: wheel;
-    position: sticky;
-    top: 1rem;
+    width: 100%;
   }
 
   .wheel-stage:has(> .selection-display:not([hidden])) .wheel-hint {
@@ -1019,15 +1071,72 @@ body {
 @media (max-width: 480px) {
   .hero {
     padding-inline: 0.5rem;
-  }
-
-  .hero__toolbar,
-  .wheel-stage {
-    max-width: 100%;
+    --stage-w: 100%;
   }
 
   .wheel-stage {
-    padding: 0.5rem;
+    --stage-pad: 0.5rem;
+  }
+}
+
+/* Short screens (phones held sideways): give the height to the wheel, not the header. */
+@media (max-height: 520px) {
+  .hero {
+    padding-top: 0.5rem;
+  }
+
+  .hero__brand,
+  .hero__tagline,
+  .wheel-hint {
+    display: none;
+  }
+
+  .hero__title {
+    margin-bottom: 0.5rem;
+    font-size: 1.15rem;
+  }
+
+  .hero__toolbar {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Touch screens: 44px targets, and 16px inputs so iOS does not zoom the page on focus. */
+@media (pointer: coarse) {
+  .toolbar-btn,
+  .feelings-search__input {
+    min-height: 44px;
+  }
+
+  .feelings-search__input,
+  .emotion-guide-dialog__textarea {
+    font-size: 16px;
+  }
+
+  .feelings-search__option {
+    padding-block: 0.7rem;
+  }
+
+  .flow-bar__back,
+  .emotion-guide__btn,
+  .colors-actions__btn,
+  .emotion-guide-dialog__btn {
+    min-height: 44px;
+  }
+
+  .selection-display__clear {
+    min-height: 44px;
+    padding-inline: 1rem;
+  }
+
+  .ref-feeling summary {
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .ref-feeling__show {
+    display: inline-block;
+    padding-block: 0.6rem;
   }
 }
 
@@ -1037,7 +1146,8 @@ body {
   .wheel-mount .wheel-label,
   .wheel-mount .wheel-hub__disc,
   .wheel-mount .wheel-zoom,
-  .wheel-mount svg {
+  .wheel-mount svg,
+  .wheel-mount {
     transition: none;
   }
 
