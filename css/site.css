@@ -12,7 +12,7 @@
   --wheel-shadow: rgba(0, 0, 0, 0.35);
   --segment-stroke: rgba(15, 20, 25, 0.55);
   --segment-text: #ffffff;
-  --center-fill: #2d3a48;
+  --center-fill: #2b8be6;
   --center-text: #ffffff;
   --accent-selected: rgba(255, 255, 255, 0.95);
 }
@@ -36,6 +36,7 @@
 }
 
 :root[data-theme="mono"] {
+  --center-fill: #4a5561;
   --hue-shift: 0;
   --sat-base: 8%;
   --light-base: 62%;
@@ -280,7 +281,18 @@ body {
   display: block;
   width: 100%;
   height: auto;
-  overflow: visible;
+  overflow: hidden;
+  border-radius: 50%;
+  transition: border-radius 450ms ease;
+}
+
+.wheel-mount.is-zoomed,
+.wheel-mount.is-zoomed svg {
+  border-radius: 18px;
+}
+
+.wheel-mount .wheel-zoom {
+  transition: transform 550ms cubic-bezier(0.22, 0.8, 0.24, 1);
 }
 
 .selection-display {
@@ -711,8 +723,40 @@ body {
   outline: none;
 }
 
+.wheel-mount .wheel-hub {
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.5));
+}
+
 .wheel-mount .wheel-hub__disc {
+  fill: var(--center-fill);
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 1.5;
   transition: fill 250ms ease;
+}
+
+.wheel-mount .wheel-hub__pulse {
+  fill: none;
+  stroke: var(--center-fill);
+  stroke-width: 3;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.wheel-mount .wheel-hub.is-cta .wheel-hub__pulse {
+  animation: hub-pulse 2.6s ease-out infinite;
+}
+
+@keyframes hub-pulse {
+  0% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
 }
 
 .wheel-mount .wheel-hub:hover .wheel-hub__disc,
@@ -727,7 +771,7 @@ body {
 }
 
 .wheel-mount .wheel-hub__hint {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   fill: var(--center-text);
   opacity: 0.85;
@@ -991,8 +1035,14 @@ body {
   .wheel-mount .wheel-rotating,
   .wheel-mount .wheel-segment,
   .wheel-mount .wheel-label,
-  .wheel-mount .wheel-hub__disc {
+  .wheel-mount .wheel-hub__disc,
+  .wheel-mount .wheel-zoom,
+  .wheel-mount svg {
     transition: none;
+  }
+
+  .wheel-mount .wheel-hub.is-cta .wheel-hub__pulse {
+    animation: none;
   }
 }
 
