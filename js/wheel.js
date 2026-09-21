@@ -506,7 +506,7 @@ function startFlow() {
   dismissStartHint();
   stopIdleWhileDragging();
   updateFlowUI();
-  selectionPanel?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "nearest" });
+  revealPanel();
 }
 
 /** One step back: leaf to middle ring, middle ring to core, core to the first question, then close. */
@@ -860,9 +860,24 @@ function selectSegment(path, { align = true, scroll = true } = {}) {
   updateFlowUI();
   stopIdleWhileDragging();
   if (align) alignSegment(path);
-  if (scroll && selectionPanel && !selectionPanel.hidden) {
-    selectionPanel.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "nearest" });
-  }
+  if (scroll && selectionPanel && !selectionPanel.hidden) revealPanel();
+}
+
+/**
+ * Bring the wheel and the top of the panel on screen together. If enough of the panel already shows,
+ * leave the page where it is; otherwise scroll the stage to the top, where the wheel pins (stacked
+ * layout) or sticks beside the panel (side-by-side layout).
+ */
+function revealPanel() {
+  if (!selectionPanel) return;
+  // Reading the rects forces layout, so this is accurate without waiting for a frame.
+  const r = selectionPanel.getBoundingClientRect();
+  const wheelTop = mount.getBoundingClientRect().top;
+  const enough = wheelTop >= 0 && r.top + Math.min(r.height, 340) <= window.innerHeight;
+  if (enough) return;
+  mount
+    .closest(".wheel-stage")
+    ?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
 }
 
 function stopAlign() {
