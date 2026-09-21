@@ -10,14 +10,22 @@ import { flattenFeelingsForReference, normalizeSegment } from "./feelings-refere
 import { FIRST_QUESTION, renderFlowPanel } from "./guided-flow.js";
 
 const VIEW = 640;
-const HUB_R = 52;
+const HUB_R = 66;
 const OUTER_R = 296;
 
 /** Center hub: a button that starts the guided flow, then steps back through it. */
 const HUB_START_LABEL = "Start";
 const HUB_CLOSE_LABEL = "Close";
 const HUB_BACK_HINT = "← back";
-const HUB_FONT_SIZE = 20;
+const HUB_FONT_SIZE = 25;
+const HUB_START_HINT = "tap to begin";
+/**
+ * Zoom on selection: the chosen branch turns to 3 o'clock (spoke labels then read left to right),
+ * the wheel centre slides to the left edge and everything scales up so the branch fills the square.
+ */
+const ZOOM_SCALE = 1.85;
+const ZOOM_SHIFT_X = -235;
+const ALIGN_DEG_ZOOMED = 0;
 const CRUMB_SEP = " › ";
 const HINT_SEEN_KEY = "feel4me:start-hint-seen";
 
@@ -61,6 +69,8 @@ let emotionSummaries = {};
 let normalizedSegments = [];
 /** @type {SVGGElement | null} */
 let hubGroup = null;
+/** @type {SVGGElement | null} wraps the rotating wheel and the hub so both zoom together */
+let zoomGroup = null;
 /** Keyboard navigation maps, rebuilt on every render. */
 let wheelNav = { rings: [], parentOf: new WeakMap(), firstChildOf: new WeakMap() };
 
@@ -289,13 +299,36 @@ function renderWheel(data) {
     }
   });
 
-  const hub = document.createElementNS(svgNs, "circle");
-  hub.setAttribute("cx", "0");
-  hub.setAttribute("cy", "0");
-  hub.setAttribute("r", String(HUB_R - 4));
-  hub.setAttribute("stroke", "var(--segment-stroke)");
-  hub.classList.add("wheel-hub__disc");
-  hubGroup.appendChild(hub);
+  const defs = document.createElementNS(svgNs, "defs");
+  const sheen = document.createElementNS(svgNs, "radialGradient");
+  sheen.id = "wheel-hub-sheen";
+  sheen.setAttribute("cx", "35%");
+  sheen.setAttribute("cy", "28%");
+  sheen.setAttribute("r", "75%");
+  for (const [offset, opacity] of [["0%", "0.38"], ["60%", "0.06"], ["100%", "0"]]) {
+    const stop = document.createElementNS(svgNs, "stop");
+    stop.setAttribute("offset", offset);
+    stop.setAttribute("stop-color", "#ffffff");
+    stop.setAttribute("stop-opacity", opacity);
+    sheen.appendChild(stop);
+  }
+  defs.appendChild(sheen);
+  svg.appendChild(defs);
+
+  const hubCircle = (cls) => {
+    const c = document.createElementNS(svgNs, "circle");
+    c.setAttribute("cx", "0");
+    c.setAttribute("cy", "0");
+    c.setAttribute("r", String(HUB_R - 4));
+    c.classList.add(cls);
+    hubGroup.appendChild(c);
+    return c;
+  };
+  hubCircle("wheel-hub__pulse").setAttribute("pointer-events", "none");
+  hubCircle("wheel-hub__disc");
+  const sheenDisc = hubCircle("wheel-hub__sheen");
+  sheenDisc.setAttribute("fill", "url(#wheel-hub-sheen)");
+  sheenDisc.setAttribute("pointer-events", "none");
 
   for (const cls of ["wheel-hub__label", "wheel-hub__hint"]) {
     const t = document.createElementNS(svgNs, "text");
@@ -308,8 +341,11 @@ function renderWheel(data) {
     hubGroup.appendChild(t);
   }
 
-  svg.appendChild(rotatingGroup);
-  svg.appendChild(hubGroup);
+  zoomGroup = document.createElementNS(svgNs, "g");
+  zoomGroup.classList.add("wheel-zoom");
+  zoomGroup.appendChild(rotatingGroup);
+  zoomGroup.appendChild(hubGroup);
+  svg.appendChild(zoomGroup);
   mount.appendChild(svg);
   applyRotation();
   const keep = selectedCrumb ? findSegmentByCrumb(selectedCrumb) : null;
@@ -388,29 +424,43 @@ function updateHub() {
 
   const name = selectedCrumb ? selectedCrumb.split(CRUMB_SEP).pop() : "";
   const rootSeg = selectedCrumb ? findSegmentByCrumb(selectedCrumb.split(CRUMB_SEP)[0]) : null;
-  disc.setAttribute("fill", rootSeg?.getAttribute("fill") ?? "var(--center-fill)");
+  // Inline style so it wins over the stylesheet's default hub fill; "" falls back to it.
+  disc.style.fill = rootSeg?.getAttribute("fill") ?? "";
   hubGroup.classList.toggle("has-selection", Boolean(name));
+  hubGroup.classList.toggle("is-cta", !name && !flowStarted);
 
   if (name) {
     label.textContent = name;
-    label.setAttribute("font-size", String(name.length > 11 ? 11 : name.length > 8 ? 13 : 16));
+    label.setAttribute("font-size", String(name.length > 11 ? 14 : name.length > 8 ? 16 : 20));
     label.setAttribute("y", "-7");
     hint.textContent = HUB_BACK_HINT;
-    hint.setAttribute("y", "13");
+    hint.setAttribute("y", "16");
     hubGroup.setAttribute("aria-label", `Back one step from ${name}`);
   } else {
     label.textContent = flowStarted ? HUB_CLOSE_LABEL : HUB_START_LABEL;
     label.setAttribute("font-size", String(HUB_FONT_SIZE));
-    label.setAttribute("y", "1");
-    hint.textContent = "";
+    label.setAttribute("y", flowStarted ? "1" : "-5");
+    hint.textContent = flowStarted ? "" : HUB_START_HINT;
+    hint.setAttribute("y", "19");
     hubGroup.setAttribute("aria-label", flowStarted ? "Close the guided questions" : "Start: help me find my feeling");
   }
 }
 
 /** Sync hub, branch dimming and the question panel with the current selection / flow state. */
+function applyZoom() {
+  const zoomed = Boolean(selectedCrumb);
+  mount.classList.toggle("is-zoomed", zoomed);
+  if (!zoomGroup) return;
+  // Always a translate+scale pair so the browser can interpolate between the two states.
+  zoomGroup.style.transform = zoomed
+    ? `translate(${ZOOM_SHIFT_X}px, 0px) scale(${ZOOM_SCALE})`
+    : "translate(0px, 0px) scale(1)";
+}
+
 function updateFlowUI() {
   updateHub();
   applyBranchDim(selectedCrumb);
+  applyZoom();
 
   const visible = Boolean(selectedCrumb) || flowStarted;
   const depth = selectedCrumb ? selectedCrumb.split(CRUMB_SEP).length : 0;
@@ -809,7 +859,7 @@ function selectSegment(path, { align = true, scroll = true } = {}) {
   dismissStartHint();
   updateFlowUI();
   stopIdleWhileDragging();
-  if (align) alignSegmentToTop(path);
+  if (align) alignSegment(path);
   if (scroll && selectionPanel && !selectionPanel.hidden) {
     selectionPanel.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "nearest" });
   }
@@ -820,13 +870,13 @@ function stopAlign() {
   alignHandle = 0;
 }
 
-/** Turn the wheel the short way round so the wedge's centre sits at 12 o'clock. */
-function alignSegmentToTop(path) {
+/** Turn the wheel the short way round so the wedge's centre points at 3 o'clock, where the zoom looks. */
+function alignSegment(path) {
   stopAlign();
   stopInertia();
   const midDeg = Number(path.dataset.midDeg) || 0;
   const from = rotationDeg;
-  const delta = ((((-90 - midDeg - from) % 360) + 540) % 360) - 180;
+  const delta = ((((ALIGN_DEG_ZOOMED - midDeg - from) % 360) + 540) % 360) - 180;
   if (prefersReducedMotion || Math.abs(delta) < 0.5) {
     rotationDeg = from + delta;
     applyRotation();
@@ -851,7 +901,8 @@ function alignSegmentToTop(path) {
 }
 
 function pointerAngle(ev) {
-  const rect = mount.getBoundingClientRect();
+  // The hub disc sits on the wheel centre, including while zoomed or mid-transition.
+  const rect = (hubGroup?.querySelector(".wheel-hub__disc") ?? mount).getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + rect.height / 2;
   return Math.atan2(ev.clientY - cy, ev.clientX - cx);
